@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>闲鱼9宫格素材</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2316130F'/%3E%3Cpath d='M7 10l3-4h12l3 4v12l-4 4h-4v-8h-4v8h-4l-4-4V10z' fill='none' stroke='%23C8102E' stroke-width='2.2' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+  :root{
+    --paper:#FAF9F7;--ink:#16130F;--ink-soft:#3B352D;--gray:#6B6259;
+    --line:#E4DED6;--red:#C8102E;--red-deep:#8F0B20;--block:#F1EDE6;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",system-ui,sans-serif;background:#E9E4DC;color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;padding:18px 10px;}
+  .tip{max-width:420px;margin:0 auto 14px;background:#fff;border:1px dashed var(--line-strong);padding:10px 14px;font-size:13px;color:var(--ink-soft);line-height:1.7;}
+  .tip b{color:var(--red-deep);}
+  .sheet{max-width:420px;margin:0 auto;}
+  .cell{width:100%;aspect-ratio:1/1;background:var(--paper);margin-bottom:12px;border:1px solid var(--line);overflow:hidden;display:flex;flex-direction:column;}
+  /* ===== 格1 首图 ===== */
+  .c1{background:var(--ink);color:#fff;position:relative;}
+  .c1 .tag{position:absolute;top:6%;left:6%;z-index:2;background:var(--red);font-size:12px;letter-spacing:.18em;padding:4px 12px;color:#fff;}
+  .c1 .imgwrap{flex:1;display:flex;align-items:center;justify-content:center;gap:14px;padding:0 8%;}
+  .c1 .pair{width:44%;display:flex;flex-direction:column;gap:5px;}
+  .c1 .pair img{width:100%;display:block;border:1px solid #3A342B;}
+  .c1 .pair span{font-size:11px;color:#C9C0B4;text-align:center;letter-spacing:.08em;}
+  .c1 .txt{position:absolute;bottom:6%;left:6%;right:6%;z-index:2;}
+  .c1 .txt h1{font-size:30px;font-weight:800;letter-spacing:.02em;line-height:1.2;}
+  .c1 .txt .sub{font-size:14px;color:#C9C0B4;margin-top:6px;letter-spacing:.1em;}
+  .c1 .priceband{display:inline-block;margin-top:10px;background:var(--red);padding:6px 14px;font-size:18px;font-weight:800;}
+  /* ===== 通用格 ===== */
+  .cell .head{display:flex;align-items:center;gap:8px;padding:7% 8% 0;}
+  .cell .head .no{width:26px;height:26px;border-radius:50%;background:var(--ink);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none;}
+  .cell .head h2{font-size:21px;font-weight:800;letter-spacing:.03em;}
+  .cell .body{padding:4% 8% 6%;flex:1;display:flex;flex-direction:column;justify-content:center;}
+  .cell .body p{font-size:14.5px;color:var(--ink-soft);margin-top:2px;}
+  .cell .body p b{color:var(--ink);}
+  .big{font-size:24px;font-weight:800;color:var(--red);}
+  .arrow{color:var(--red);font-weight:800;}
+  .rows .r{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:5px 0;border-bottom:1px dashed var(--line);font-size:14px;}
+  .rows .r:last-child{border-bottom:none;}
+  .rows .r .p{color:var(--red);font-weight:800;white-space:nowrap;}
+  .flow .step{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:14px;}
+  .flow .step .n{width:20px;height:20px;border-radius:50%;background:var(--red);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none;}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;}
+  .chip{font-size:12.5px;border:1px solid var(--line-strong);padding:3px 10px;background:#fff;}
+  .chips2 .ch{font-size:14px;padding:4px 0;border-bottom:1px dashed var(--line);}
+  .chips2 .ch:last-child{border-bottom:none;}
+  .cell.contact{background:var(--ink);color:#fff;}
+  .cell.contact .head h2{color:#fff;}
+  .cell.contact .head .no{background:var(--red);}
+  .cell.contact .bigline{font-size:22px;font-weight:800;margin-top:2px;}
+  .cell.contact .small{font-size:13px;color:#9A9188;margin-top:4px;}
+  .cell.contact .cta{display:inline-block;margin-top:12px;background:var(--red);padding:8px 18px;font-size:15px;font-weight:700;}
+</style>
+</head>
+<body>
+<div class="tip">使用说明：本页共 9 张 1:1 方形图，逐格滚动截图即可作为闲鱼 9 宫格素材。第 1 格为商品首图，第 9 格为联系图。</div>
+<div class="sheet">
+
+  <!-- 格1 首图 -->
+  <div class="cell c1">
+    <div class="tag">AI 视觉定制 · 服装模特图</div>
+    <div class="imgwrap">
+      <div class="pair"><img src="assets/case-flat-1.jpg" alt="红黑格纹衬衫平铺图"><span>客户素材 · 平铺图</span></div>
+      <div class="pair"><img src="assets/ai-onbody-1.jpg" alt="AI模特上身效果图"><span>AI 出图 · 上身</span></div>
+    </div>
+    <div class="txt">
+      <h1>AI 服装模特图</h1>
+      <div class="sub">平铺图 → 真人上身效果图</div>
+      <span class="priceband">体验价 49 元 / 件</span>
+    </div>
+  </div>
+
+  <!-- 格2 服务是什么 -->
+  <div class="cell">
+    <div class="head"><span class="no">1</span><h2>这是什么服务</h2></div>
+    <div class="body">
+      <p>你提供<b>服装平铺图</b>或上身图，我们用 AI 生成<b>真人模特上身效果图</b>，还原面料纹理与图案细节。</p>
+      <p style="margin-top:8px;font-size:13px;color:var(--gray);">模特图由我们提供，多体型、多肤色可选。</p>
+    </div>
+  </div>
+
+  <!-- 格3 价格 -->
+  <div class="cell">
+    <div class="head"><span class="no">2</span><h2>价格</h2></div>
+    <div class="body">
+      <div class="big">49 元体验价</div>
+      <p style="font-size:13px;color:var(--gray);">1 件服装 · 正面 + 侧面 2 张 · 含精修</p>
+      <div class="rows" style="margin-top:10px;">
+        <div class="r"><span>批量换装（20–50 件）</span><span class="p">1000–3000 元</span></div>
+        <div class="r"><span>月度合作</span><span class="p">1500–5000 元/月</span></div>
+        <div class="r"><span>主图 / 详情页</span><span class="p">199–499 元/件</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 格4 交付规格 -->
+  <div class="cell">
+    <div class="head"><span class="no">3</span><h2>交付规格</h2></div>
+    <div class="body">
+      <div class="chips">
+        <span class="chip">淘宝主图 800×800</span>
+        <span class="chip">详情页宽图</span>
+        <span class="chip">小红书 / 抖音 3:4</span>
+        <span class="chip">朋友圈 1:1</span>
+        <span class="chip">高清大图</span>
+      </div>
+      <p style="margin-top:12px;font-size:13px;color:var(--gray);">按平台要求导出，含源文件。默认 2 轮免费修改。</p>
+    </div>
+  </div>
+
+  <!-- 格5 流程 -->
+  <div class="cell">
+    <div class="head"><span class="no">4</span><h2>服务流程</h2></div>
+    <div class="body flow">
+      <div class="step"><span class="n">1</span><span>拍下后发服装图给我</span></div>
+      <div class="step"><span class="n">2</span><span>确认模特风格与角度</span></div>
+      <div class="step"><span class="n">3</span><span>出小样，您确认</span></div>
+      <div class="step"><span class="n">4</span><span>精修后按规格交付</span></div>
+      <p style="margin-top:8px;font-size:13px;color:var(--gray);">单件 2–4 小时交付，批量按批走。</p>
+    </div>
+  </div>
+
+  <!-- 格6 适合谁 -->
+  <div class="cell">
+    <div class="head"><span class="no">5</span><h2>适合谁用</h2></div>
+    <div class="body chips2">
+      <div class="ch"><b>淘宝 / 拼多多 / 抖音卖家</b> · 新品上新要模特图</div>
+      <div class="ch"><b>批发档口</b> · 一件代发 / 朋友圈卖货</div>
+      <div class="ch"><b>微商 / 私域</b> · 日常穿搭展示</div>
+      <p style="margin-top:10px;font-size:13px;color:var(--gray);">传统拍摄一季 4000–10000 元，AI 出图只需零头。</p>
+    </div>
+  </div>
+
+  <!-- 格7 为什么选 -->
+  <div class="cell">
+    <div class="head"><span class="no">6</span><h2>为什么选我们</h2></div>
+    <div class="body">
+      <p><b>省成本</b>：价格只有传统拍摄的 1/3 到 1/10</p>
+      <p><b>出图快</b>：不用等模特档期，2–4 小时交付</p>
+      <p><b>效果可控</b>：面料纹理精准还原，逐张人工精修</p>
+      <p><b>可批量</b>：一套模特库，多款式批量出图</p>
+    </div>
+  </div>
+
+  <!-- 格8 注意事项 -->
+  <div class="cell">
+    <div class="head"><span class="no">7</span><h2>下单前请看</h2></div>
+    <div class="body">
+      <p>1. 请提供<b>清晰的平铺图 / 上身图</b>（白底、光线均匀为佳）</p>
+      <p>2. <b>蕾丝、薄纱、雪纺</b>等透明面料先咨询，先试做再下单</p>
+      <p>3. 效果图由 AI 生成，细节以实际沟通确认为准</p>
+    </div>
+  </div>
+
+  <!-- 格9 联系 -->
+  <div class="cell contact">
+    <div class="head"><span class="no">8</span><h2>联系下单</h2></div>
+    <div class="body">
+      <div class="bigline">微信：单辰</div>
+      <div class="bigline">电话：加微信后提供</div>
+      <div class="small">发图即可免费评估 · 批量长期合作可议价</div>
+      <span class="cta">加微信 立即体验</span>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

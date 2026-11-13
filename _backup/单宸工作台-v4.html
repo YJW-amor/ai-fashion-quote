@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>单宸工作台</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2316130F'/%3E%3Cpath d='M7 10l3-4h12l3 4v12l-4 4h-4v-8h-4v8h-4l-4-4V10z' fill='none' stroke='%23C8102E' stroke-width='2.2' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+  :root{
+    --paper:#FAF9F7;--ink:#16130F;--ink-soft:#3B352D;--gray:#6B6259;
+    --line:#E4DED6;--line-strong:#C9C1B6;--red:#C8102E;--red-deep:#8F0B20;--block:#F1EDE6;
+    --ok:#2F6B3C;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  html,body{min-height:100%;}
+  body{font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",system-ui,sans-serif;background:#E9E4DC;color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;font-size:14px;}
+  button{font-family:inherit;border:none;cursor:pointer;background:none;color:inherit;font-size:inherit;}
+  input,select,textarea{font-family:inherit;font-size:16px;color:var(--ink);}
+  img{display:block;}
+
+  /* ===== 布局 ===== */
+  .shell{display:flex;min-height:100vh;}
+  .side{width:232px;flex:none;background:var(--ink);color:#EDE7DE;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;}
+  .side .brand{display:flex;align-items:center;gap:10px;padding:20px 18px 16px;}
+  .side .brand .logo{width:34px;height:34px;flex:none;}
+  .side .brand b{font-size:17px;letter-spacing:.14em;font-weight:800;color:#fff;}
+  .side .brand span{display:block;font-size:10px;color:#9A9188;letter-spacing:.3em;margin-top:1px;}
+  .nav{padding:6px 10px;flex:1;}
+  .nav .cap{font-size:10.5px;color:#8A8177;letter-spacing:.24em;padding:10px 10px 6px;}
+  .nav .item{display:flex;align-items:center;gap:10px;width:100%;padding:11px 12px;color:#C9C0B4;font-size:13.5px;letter-spacing:.06em;text-align:left;border-left:3px solid transparent;}
+  .nav .item svg{width:17px;height:17px;flex:none;}
+  .nav .item.on{background:rgba(200,16,46,.16);color:#fff;border-left-color:var(--red);font-weight:700;}
+  .side .foot{padding:16px 18px;border-top:1px solid #2C2720;font-size:11px;color:#9A9188;letter-spacing:.05em;}
+  .side .foot b{color:#C9C0B4;font-weight:700;}
+  .nav .core{font-size:9px;color:var(--red);border:1px solid rgba(200,16,46,.6);padding:1px 5px;letter-spacing:.14em;margin-left:auto;line-height:1.4;}
+  .links{padding:4px 10px 10px;border-top:1px solid #2C2720;}
+  .links .cap{font-size:10px;color:#6F675C;letter-spacing:.2em;padding:10px 10px 6px;}
+  .links a{display:flex;align-items:center;gap:9px;padding:8px 12px;font-size:12.5px;color:#B4AA9C;letter-spacing:.05em;text-decoration:none;}
+  .links a:hover{color:#fff;background:rgba(255,255,255,.05);}
+  .links a svg{width:15px;height:15px;flex:none;color:#8A8177;}
+  .side .saved{display:flex;align-items:center;gap:6px;margin-top:12px;font-size:10px;color:#6F675C;letter-spacing:.04em;}
+  .side .saved svg{width:12px;height:12px;flex:none;color:var(--ok);}
+  .side .navman{width:100%;margin-top:10px;padding:8px 0;background:transparent;border:1px solid #3A342C;color:#C9C0B4;font-size:11.5px;letter-spacing:.1em;cursor:pointer;}
+  .side .navman:hover{border-color:var(--red);color:#fff;}
+  .nvlist{padding:10px 0;}
+  .nvrow{display:flex;align-items:center;gap:10px;padding:9px 4px;border-bottom:1px dashed var(--line);}
+  .nvrow:last-child{border-bottom:none;}
+  .nvrow .ck{width:20px;height:20px;flex:none;border:1.5px solid var(--line-strong);border-radius:5px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:#fff;}
+  .nvrow .ck svg{width:12px;height:12px;color:#fff;opacity:0;}
+  .nvrow.on .ck{background:var(--red);border-color:var(--red);}
+  .nvrow.on .ck svg{opacity:1;}
+  .nvrow .nt{font-size:13.5px;flex:1;min-width:0;}
+  .nvrow .ng{font-size:10px;color:var(--gray);letter-spacing:.1em;border:1px solid var(--line);padding:1px 6px;}
+  .nvrow.off .nt{color:var(--gray);}
+  .nav .item .it{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+  .nav .item .it-t{font-size:13.5px;letter-spacing:.06em;color:inherit;}
+  .nav .item .it-d{font-size:10px;color:#6F675C;letter-spacing:.04em;}
+  .nav .item.on .it-d{color:#A99F92;}
+  .sport{display:grid;grid-template-columns:1.1fr .9fr;gap:16px;align-items:start;}
+  .slist{margin-top:6px;}
+  .sitem{display:flex;align-items:center;gap:10px;padding:11px 12px;border:1px solid var(--line);background:#fff;margin-bottom:8px;}
+  .sitem.low{border-color:#C8102E;background:#FBF1F2;}
+  .sitem .sn{flex:1;min-width:0;font-size:13.5px;font-weight:700;letter-spacing:.04em;}
+  .sitem .sq{font-size:12.5px;color:var(--gray);font-weight:700;width:56px;}
+  .sop{border:1px solid var(--line-strong);background:#fff;font-size:11.5px;color:var(--ink);padding:5px 9px;cursor:pointer;}
+  .sop.out{color:var(--red);border-color:#C8102E;}
+  .sdel{border:none;background:none;font-size:16px;color:var(--gray);cursor:pointer;padding:2px 4px;}
+  .ph2{display:flex;align-items:center;gap:10px;padding:2px 0 8px;}
+  .ph2 span{font-size:12px;color:var(--gray);letter-spacing:.1em;font-weight:700;}
+  .ph2 .subcnt{margin-left:auto;font-size:10.5px;color:var(--gray);}
+  .path{padding:2px 0;}
+  .pstep{display:flex;gap:14px;align-items:baseline;padding:10px 2px;border-bottom:1px dashed var(--line);}
+  .pstep:last-child{border-bottom:none;}
+  .pstep b{font-size:12.5px;color:var(--red);flex:none;width:52px;letter-spacing:.04em;}
+  .pstep span{font-size:13px;color:var(--ink);}
+  .words{display:grid;grid-template-columns:repeat(2,1fr);gap:0 16px;padding:2px 0;}
+  .wd{display:flex;gap:10px;align-items:baseline;padding:7px 2px;border-bottom:1px dashed var(--line);}
+  .wd b{font-size:13px;font-weight:800;letter-spacing:.02em;flex:none;}
+  .wd span{font-size:12px;color:var(--gray);}
+
+  .main{flex:1;min-width:0;padding:22px 26px 60px;}
+  .top{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap;}
+  .top h1{font-size:22px;font-weight:800;letter-spacing:.04em;}
+  .top .date{font-size:12.5px;color:var(--gray);letter-spacing:.08em;}
+  .top .date b{color:var(--red);font-weight:800;}
+
+  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px;}
+  .card{background:var(--paper);border:1px solid var(--line);padding:13px 15px;position:relative;}
+  .card .k{font-size:11.5px;color:var(--gray);letter-spacing:.1em;display:flex;align-items:center;gap:6px;}
+  .card .k svg{width:13px;height:13px;}
+  .card .v{font-size:23px;font-weight:800;letter-spacing:.02em;margin-top:4px;}
+  .card .v small{font-size:11.5px;color:var(--gray);font-weight:400;letter-spacing:.05em;}
+  .card .s{font-size:10.5px;color:var(--gray);margin-top:1px;letter-spacing:.04em;}
+  .card.red .k{color:var(--red);}
+  .card .tag{display:inline-block;background:var(--red);color:#fff;font-size:9.5px;letter-spacing:.12em;padding:1px 6px;margin-left:5px;vertical-align:1px;}
+
+  /* ===== 视图 ===== */
+  .view{display:none;margin-top:18px;}
+  .view.on{display:block;}
+  .panel{background:var(--paper);border:1px solid var(--line);}
+  .panel .ph{display:flex;align-items:center;gap:9px;padding:13px 16px;border-bottom:1px solid var(--line);}
+  .panel .ph h2{font-size:15px;font-weight:800;letter-spacing:.04em;}
+  .panel .ph .hint{margin-left:auto;font-size:11px;color:var(--gray);letter-spacing:.04em;}
+  .panel .ph .no{width:21px;height:21px;border-radius:50%;background:var(--ink);color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;flex:none;}
+  .panel .ph .no.r{background:var(--red);}
+
+  /* ===== 今日计划 ===== */
+  .todo{margin-top:16px;display:grid;grid-template-columns:1fr 300px;gap:16px;align-items:start;}
+  .todo-list{padding:6px 16px 14px;}
+  .tstats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:14px 16px 2px;}
+  .ts{border:1px solid var(--line);background:#fff;text-align:center;padding:10px 6px;}
+  .ts b{display:block;font-size:22px;font-weight:800;letter-spacing:.02em;}
+  .ts span{font-size:10.5px;color:var(--gray);letter-spacing:.1em;}
+  .ts.red b{color:var(--red);}
+  .tg{display:flex;align-items:center;gap:10px;padding:16px 16px 6px;}
+  .tg .tn{font-size:11px;letter-spacing:.14em;color:var(--gray);border:1px solid var(--line-strong);padding:2px 8px;}
+  .tg .tp{margin-left:auto;font-size:10.5px;color:var(--gray);}
+  .todo-item{display:flex;align-items:center;gap:11px;padding:12px 2px;border-bottom:1px dashed var(--line);cursor:pointer;}
+  .todo-item:hover{background:#FBFAF7;}
+  .todo-item:last-child{border-bottom:none;}
+  .todo-item .chk{width:20px;height:20px;flex:none;border:1.5px solid var(--line-strong);border-radius:50%;display:flex;align-items:center;justify-content:center;}
+  .todo-item .chk svg{width:12px;height:12px;color:#fff;opacity:0;}
+  .todo-item.done .chk{background:var(--ok);border-color:var(--ok);}
+  .todo-item.done .chk svg{opacity:1;}
+  .todo-item .tx{flex:1;min-width:0;font-size:13.5px;}
+  .todo-item.done .tx{color:var(--gray);text-decoration:line-through;}
+  .todo-item .tag{flex:none;font-size:10px;color:var(--red);border:1px solid var(--red);padding:1px 7px;letter-spacing:.08em;}
+  .todo-item .tag.b{color:var(--gray);border-color:var(--line-strong);}
+  .todo-item .no{flex:none;width:26px;font-size:11px;color:var(--gray);letter-spacing:.05em;font-variant-numeric:tabular-nums;}
+  .todo-item.done .no{color:var(--line-strong);}
+  .todo-item .del{flex:none;color:var(--line-strong);font-size:16px;padding:2px 6px;}
+  .todo-item .del:hover{color:var(--red);}
+  .todo-item .ar{flex:none;color:var(--line-strong);font-size:15px;padding:2px 2px 2px 8px;}
+  .todo-add{display:flex;gap:9px;padding:13px 16px 16px;}
+  .todo-add input{flex:1;min-width:0;border:1.5px solid var(--line);background:#fff;padding:9px 11px;outline:none;}
+  .todo-add input:focus{border-color:var(--red);}
+  .todo-side{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .todo-count .n{font-size:30px;font-weight:800;color:var(--red);line-height:1.1;padding:14px 16px;}
+  .todo-count .n small{font-size:12px;color:var(--gray);font-weight:400;letter-spacing:.05em;}
+  .todo-count .bar{height:6px;background:var(--block);margin:0 16px 14px;}
+  .todo-count .bar i{display:block;height:100%;background:var(--red);width:0;}
+  .quote{padding:14px 16px;}
+  .quote .q1{font-size:11px;color:var(--gray);letter-spacing:.14em;}
+  .quote .q2{font-size:16px;font-weight:800;margin-top:5px;line-height:1.5;letter-spacing:.02em;}
+  .quote .q3{font-size:11.5px;color:var(--gray);margin-top:6px;letter-spacing:.03em;}
+
+  /* ===== 订单看板 ===== */
+  .order-tools{display:flex;gap:10px;align-items:center;padding:13px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap;}
+  .order-tools .f{display:flex;align-items:center;gap:8px;}
+  .order-tools label{font-size:11.5px;color:var(--gray);letter-spacing:.06em;}
+  .order-tools input,.order-tools select{border:1.5px solid var(--line);background:#fff;padding:7px 9px;outline:none;font-size:13px;}
+  .order-tools input:focus,.order-tools select:focus{border-color:var(--red);}
+  .order-tools .add{margin-left:auto;background:var(--red);color:#fff;padding:8px 16px;font-size:13px;font-weight:700;letter-spacing:.08em;}
+  .order-tools .add:hover{background:var(--red-deep);}
+  .order-table{width:100%;border-collapse:collapse;}
+  .order-table th{font-size:11px;color:var(--gray);letter-spacing:.12em;text-align:left;padding:10px 14px;border-bottom:1px solid var(--line-strong);background:var(--block);font-weight:700;}
+  .order-table td{padding:12px 14px;border-bottom:1px dashed var(--line);font-size:13px;vertical-align:middle;}
+  .order-table tr:last-child td{border-bottom:none;}
+  .order-table .cli b{display:block;font-size:13.5px;}
+  .order-table .cli span{font-size:11px;color:var(--gray);}
+  .order-table .amt{font-weight:800;color:var(--red);white-space:nowrap;}
+  .st{display:inline-block;font-size:10.5px;padding:2px 9px;letter-spacing:.08em;white-space:nowrap;}
+  .st.s1{background:#F1EDE6;color:var(--gray);border:1px solid var(--line-strong);}
+  .st.s2{background:#FBF1F2;color:var(--red);border:1px solid #E7B8C0;}
+  .st.s3{background:#FDF3E3;color:#8A5A14;border:1px solid #E8CE9E;}
+  .st.s4{background:#EEF4EE;color:var(--ok);border:1px solid #C4D9C6;}
+  .st.s5{background:#EDE8DE;color:var(--ink-soft);border:1px solid var(--line-strong);}
+  .order-table .ops{display:flex;gap:6px;align-items:center;}
+  .order-table .ops button{border:1px solid var(--line-strong);padding:4px 9px;font-size:11.5px;color:var(--ink-soft);background:#fff;white-space:nowrap;}
+  .order-table .ops button:hover{border-color:var(--red);color:var(--red);}
+  .order-table .ops .del{color:var(--gray);border-color:transparent;}
+  .order-table .ops .del:hover{color:var(--red);border-color:var(--red);}
+  .empty{padding:34px 16px;text-align:center;font-size:12.5px;color:var(--gray);letter-spacing:.06em;}
+
+  /* ===== 灵感库 ===== */
+  .inspo{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:16px;}
+  .isp{border:1px solid var(--line);background:#fff;}
+  .isp .im{position:relative;}
+  .isp .im img{width:100%;aspect-ratio:4/3;object-fit:cover;}
+  .isp .im .lbl{position:absolute;left:8px;bottom:8px;background:var(--ink);color:#fff;font-size:10px;letter-spacing:.1em;padding:3px 8px;}
+  .isp .im.bg1{background:#EAE4DB url(assets/case-flat-1.jpg) center/cover no-repeat;}
+  .isp .im.bg2{background:#EAE4DB url(assets/ai-onbody-1.jpg) center/cover no-repeat;}
+  .isp .im.bg3{background:#EAE4DB url(assets/case-live-1.jpg) center/cover no-repeat;}
+  .isp .tx{padding:11px 13px 13px;}
+  .isp .tx b{display:block;font-size:13.5px;letter-spacing:.02em;}
+  .isp .tx span{display:block;font-size:11.5px;color:var(--gray);margin-top:4px;line-height:1.55;}
+  .inspo-add{padding:0 16px 16px;display:flex;gap:9px;}
+  .inspo-add input{flex:1;min-width:0;border:1.5px solid var(--line);background:#fff;padding:9px 11px;outline:none;font-size:13px;}
+  .inspo-add input:focus{border-color:var(--red);}
+  .inspo-add button{background:var(--ink);color:#fff;padding:9px 16px;font-size:12.5px;letter-spacing:.08em;font-weight:700;}
+  .inspo-add button:hover{background:var(--red);}
+
+  /* ===== 热点二创 / 备忘录 ===== */
+  .hlist{padding:6px 16px 14px;}
+  .hitem{display:flex;gap:11px;align-items:flex-start;padding:12px 2px;border-bottom:1px dashed var(--line);}
+  .hitem:last-child{border-bottom:none;}
+  .hitem .dot{width:8px;height:8px;border-radius:50%;background:var(--red);margin-top:6px;flex:none;}
+  .hitem .tx{flex:1;min-width:0;}
+  .hitem .tx b{display:block;font-size:13.5px;letter-spacing:.02em;}
+  .hitem .tx span{display:block;font-size:11.5px;color:var(--gray);margin-top:2px;line-height:1.55;}
+  .hitem .tag{flex:none;font-size:10px;border:1px solid var(--line-strong);color:var(--gray);padding:1px 7px;letter-spacing:.06em;white-space:nowrap;}
+  .hitem .st{flex:none;font-size:10px;border:1px solid var(--red);color:var(--red);padding:1px 8px;letter-spacing:.06em;background:#fff;cursor:pointer;}
+  .hitem .st:hover{border-color:var(--red-deep);background:#FBF1F2;}
+  .hitem .st.on{border-color:var(--line-strong);color:var(--gray);background:#fff;}
+  .hitem.done .tx b{color:var(--gray);text-decoration:line-through;}
+  .hitem .del{flex:none;color:var(--line-strong);font-size:15px;padding:2px 6px;}
+  .hitem .del:hover{color:var(--red);}
+  .addrow{display:flex;gap:9px;padding:0 16px 16px;}
+  .addrow input{flex:1;min-width:0;border:1.5px solid var(--line);background:#fff;padding:9px 11px;outline:none;font-size:13px;}
+  .addrow input:focus{border-color:var(--red);}
+  .addrow button{background:var(--ink);color:#fff;padding:9px 16px;font-size:12.5px;letter-spacing:.08em;font-weight:700;}
+  .addrow button:hover{background:var(--red);}
+
+  /* ===== 内容复盘 ===== */
+  .rv-form{padding:16px;border-bottom:1px solid var(--line);}
+  .rv-form .row{display:flex;gap:10px;margin-bottom:10px;align-items:center;}
+  .rv-form .row label{font-size:11.5px;color:var(--gray);letter-spacing:.06em;flex:none;}
+  .rv-form input,.rv-form textarea{flex:1;border:1.5px solid var(--line);background:#fff;padding:8px 10px;outline:none;font-size:13px;resize:vertical;}
+  .rv-form input:focus,.rv-form textarea:focus{border-color:var(--red);}
+  .rv-form .go{background:var(--red);color:#fff;padding:8px 18px;font-size:12.5px;font-weight:700;letter-spacing:.08em;flex:none;}
+  .rv-list{padding:6px 16px 14px;}
+  .rv-item{padding:12px 2px;border-bottom:1px dashed var(--line);display:flex;gap:11px;}
+  .rv-item:last-child{border-bottom:none;}
+  .rv-item .d{flex:none;font-size:11px;color:var(--gray);letter-spacing:.06em;padding-top:2px;width:86px;}
+  .rv-item .d b{display:block;font-size:12px;color:var(--ink);letter-spacing:.02em;}
+  .rv-item .tx{flex:1;min-width:0;font-size:13px;line-height:1.65;}
+  .rv-item .del{flex:none;color:var(--line-strong);font-size:15px;padding:0 4px;}
+  .rv-item .del:hover{color:var(--red);}
+
+  /* ===== 详情抽屉 ===== */
+  .mask{position:fixed;inset:0;background:rgba(22,19,15,.5);z-index:60;display:none;}
+  .mask.on{display:block;}
+  .drawer{position:fixed;left:0;right:0;bottom:0;background:var(--paper);z-index:61;border-top:3px solid var(--red);max-height:78vh;display:none;flex-direction:column;box-shadow:0 -10px 40px rgba(22,19,15,.25);}
+  .drawer.on{display:flex;}
+  .drawer .dh{display:flex;align-items:center;gap:10px;padding:15px 18px 13px;border-bottom:1px solid var(--line);flex:none;}
+  .drawer .dh b{font-size:15px;letter-spacing:.03em;}
+  .drawer .dh .x{margin-left:auto;font-size:20px;color:var(--gray);padding:2px 8px;}
+  .drawer .dh .x:hover{color:var(--red);}
+  .drawer .db{padding:15px 18px 28px;overflow-y:auto;}
+  .drawer .db h4{font-size:12px;letter-spacing:.1em;color:var(--gray);margin:15px 0 7px;}
+  .drawer .db h4:first-child{margin-top:0;}
+  .drawer .db ul{margin:0;padding-left:18px;}
+  .drawer .db li{font-size:13px;line-height:1.7;margin-bottom:5px;}
+  .drawer .db a{color:var(--red);text-decoration:underline;word-break:break-all;}
+  .drawer .db .note{margin-top:12px;font-size:11px;color:var(--gray);background:var(--block);border:1px solid var(--line);padding:9px 11px;line-height:1.6;}
+  .subs{padding:2px 0;}
+  .sub-c{display:flex;align-items:center;gap:10px;padding:9px 2px;border-bottom:1px dashed var(--line);cursor:pointer;}
+  .sub-c:last-child{border-bottom:none;}
+  .sub-c .sc{width:18px;height:18px;flex:none;border:1.5px solid var(--line-strong);border-radius:50%;display:flex;align-items:center;justify-content:center;}
+  .sub-c .sc svg{width:11px;height:11px;color:#fff;opacity:0;}
+  .sub-c.done .sc{background:var(--ok);border-color:var(--ok);}
+  .sub-c.done .sc svg{opacity:1;}
+  .sub-c .stx{font-size:13px;flex:1;min-width:0;line-height:1.5;}
+  .sub-c.done .stx{color:var(--gray);text-decoration:line-through;}
+  .subcnt{font-size:10.5px;color:var(--gray);letter-spacing:.05em;}
+  @media (min-width:900px){ .drawer{left:50%;right:auto;width:560px;transform:translateX(-50%);} }
+
+  /* ===== 营销节点 ===== */
+  .nodes{padding:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+  .node{border:1px solid var(--line);background:#fff;padding:13px 14px;position:relative;}
+  .node .d{font-size:11px;color:var(--gray);letter-spacing:.08em;}
+  .node .d b{color:var(--red);font-size:12px;}
+  .node h3{font-size:14px;font-weight:800;margin-top:4px;letter-spacing:.02em;}
+  .node p{font-size:11.5px;color:var(--ink-soft);margin-top:5px;line-height:1.6;}
+  .node .act{display:inline-block;margin-top:8px;font-size:10.5px;color:var(--red);border:1px solid var(--red);padding:2px 8px;letter-spacing:.05em;}
+  .node .x{position:absolute;right:8px;top:6px;color:var(--line-strong);font-size:14px;padding:2px 5px;}
+  .node .x:hover{color:var(--red);}
+
+  /* ===== 文案生成 ===== */
+  .gen{display:grid;grid-template-columns:330px 1fr;gap:16px;align-items:start;}
+  .gen-form{padding:16px;}
+  .gf{margin-bottom:14px;}
+  .gf label{display:block;font-size:11.5px;color:var(--gray);letter-spacing:.1em;margin-bottom:6px;}
+  .gf .segs{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .seg{border:1.5px solid var(--line);background:#fff;padding:10px 8px;text-align:center;font-size:12.5px;}
+  .seg .ps{display:block;font-size:10px;color:var(--gray);margin-top:2px;letter-spacing:.03em;}
+  .seg.sel{border-color:var(--red);background:#FBF1F2;font-weight:800;}
+  .gf input,.gf textarea{width:100%;border:1.5px solid var(--line);background:#fff;padding:9px 11px;outline:none;resize:vertical;}
+  .gf input:focus,.gf textarea:focus{border-color:var(--red);}
+  .gen-run{width:100%;background:var(--red);color:#fff;padding:11px;font-size:14px;font-weight:800;letter-spacing:.12em;}
+  .gen-run:hover{background:var(--red-deep);}
+  .gen-out{padding:16px;}
+  .gen-out .oh{display:flex;align-items:center;gap:9px;font-size:11px;color:var(--gray);letter-spacing:.14em;margin-bottom:10px;}
+  .gen-out .oh .copy{margin-left:auto;border:1px solid var(--line-strong);padding:5px 12px;font-size:11.5px;color:var(--ink-soft);background:#fff;letter-spacing:.06em;}
+  .gen-out .oh .copy:hover{border-color:var(--red);color:var(--red);}
+  .gen-out .box{background:var(--block);border:1px solid var(--line);padding:15px 16px;font-size:13.5px;white-space:pre-wrap;line-height:1.75;min-height:200px;}
+  .gen-out .empty2{color:var(--gray);}
+  .gen-out .tip{margin-top:10px;font-size:11px;color:var(--gray);letter-spacing:.04em;}
+
+  /* ===== 底部窄屏导航 ===== */
+  .tabs{display:none;}
+  @media (max-width:900px){
+    .side{display:none;}
+    .main{padding:14px 14px 70px;}
+    .tabs{display:flex;position:fixed;left:0;right:0;bottom:0;background:var(--ink);z-index:50;overflow-x:auto;}
+    .tabs button{flex:none;min-width:66px;color:#9A9188;font-size:10px;letter-spacing:.04em;padding:8px 6px 9px;display:flex;flex-direction:column;align-items:center;gap:3px;}
+    .tabs button svg{width:18px;height:18px;}
+    .tabs button.on{color:#fff;background:rgba(200,16,46,.22);}
+    .cards{grid-template-columns:repeat(2,1fr);}
+    .todo{grid-template-columns:1fr;}
+    .todo-side{grid-template-columns:1fr 1fr;}
+    .inspo,.nodes{grid-template-columns:1fr;}
+    .gen,.sport{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <!-- ===== 侧边导航（桌面） ===== -->
+  <aside class="side">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="6" fill="#1E1A14"/><path d="M7 10l3-4h12l3 4v12l-4 4h-4v-8h-4v8h-4l-4-4V10z" fill="none" stroke="#C8102E" stroke-width="2.2" stroke-linejoin="round"/></svg>
+      <div><b>单宸工作台</b><span>AI 服装出图</span></div>
+    </div>
+    <nav class="nav" id="nav"></nav>
+    <div class="links">
+      <div class="cap">常用链接 · 一键跳转</div>
+      <a href="https://creator.douyin.com" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l2.1 4.3 4.7.7-3.4 3.3.8 4.7L12 13.8 7.8 16l.8-4.7L5.2 8l4.7-.7z"/></svg>抖音创作者平台</a>
+      <a href="https://www.bilibili.com" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8l2-2M6 8L4 6M4 8h16v9a3 3 0 01-3 3H7a3 3 0 01-3-3zM9 12h.01M15 12h.01"/></svg>哔哩哔哩</a>
+      <a href="https://www.douyin.com/hot" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 2L4.5 12.5H11L9.5 22 19 10.5h-6.5z"/></svg>抖音热榜</a>
+      <a href="https://www.bilibili.com/v/popular/all" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12a9 9 0 11-3-6.7"/><path d="M21 3v6h-6"/></svg>B站热门</a>
+    </div>
+    <div class="foot">
+      <div>微信 <b>单宸</b></div>
+      <div style="margin-top:2px;">电话 加微信后提供</div>
+      <div class="saved"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l3 3 8-8"/><path d="M20 12v6a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h9"/></svg>数据已本地保存（离线可用）</div>
+      <button class="navman" id="navManBtn">管理侧边栏模块</button>
+    </div>
+  </aside>
+
+  <!-- 侧边栏管理面板 -->
+  <div class="mask" id="navMask"></div>
+  <div class="drawer" id="navPanel">
+    <div class="dh"><b>管理侧边栏模块</b><button class="x" id="navClose" aria-label="关闭">×</button></div>
+    <div class="db">
+      <div class="note">勾选要在侧边栏显示的模块，取消勾选即隐藏（数据不会丢失）</div>
+      <div class="nvlist" id="navList"></div>
+    </div>
+  </div>
+
+  <!-- ===== 主区 ===== -->
+  <main class="main">
+    <div class="top">
+      <h1 id="pageTitle">今日计划</h1>
+      <div class="date" id="todayLine">—</div>
+    </div>
+
+    <div class="cards">
+      <div class="card red"><div class="k">本月订单 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l7 4v10l-7 4-7-4V7z"/></svg></div><div class="v" id="kOrders">0</div><div class="s">示例数据，随订单增删</div></div>
+      <div class="card"><div class="k">本月收入</div><div class="v" id="kIncome">¥0</div><div class="s">已交付订单合计</div></div>
+      <div class="card"><div class="k">待交付</div><div class="v" id="kPending">0 <small>单</small></div><div class="s">出图中 / 待交付 / 已接单</div></div>
+      <div class="card"><div class="k">累计出图</div><div class="v" id="kSheets">0 <small>张</small></div><div class="s">全部订单张数合计</div></div>
+    </div>
+
+    <!-- ===== 视图：今日计划 ===== -->
+    <section class="view on" id="view-todo">
+      <div class="todo">
+        <div class="panel">
+          <div class="ph"><span class="no r">1</span><h2>今日待办</h2><span class="hint" id="todoHint">点击圆圈勾选完成</span></div>
+          <div class="tstats" id="todoStats"></div>
+          <div class="todo-list" id="todoList"></div>
+          <div class="todo-add">
+            <input id="todoInput" placeholder="添加一件今天要做的事，回车确认" maxlength="40">
+            <button id="todoAdd" style="background:var(--ink);color:#fff;padding:9px 16px;font-size:12.5px;letter-spacing:.08em;font-weight:700;">添加</button>
+          </div>
+        </div>
+        <div class="todo-side">
+          <div class="panel todo-count">
+            <div class="n" id="todoNum">0<small> / 已完成</small></div>
+            <div class="bar"><i id="todoBar"></i></div>
+            <div class="quote">
+              <div class="q1">今日一句</div>
+              <div class="q2" id="todayQuote">把今天该出的图出掉。</div>
+              <div class="q3" id="quoteSrc">— 单宸工作台</div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="ph"><span class="no">2</span><h2>固定节奏</h2></div>
+            <div class="quote">
+              <div class="q2" style="font-size:14px;line-height:1.8;">早：回消息 · 处理前夜订单<br>午：集中出图 · 交付<br>晚：发闲鱼 · 记明天计划</div>
+              <div class="q3" style="margin-top:8px;">按你自己的节奏调整</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 库存看板 -->
+      <div class="panel">
+        <div class="ph"><span class="no r">2</span><h2>库存看板</h2><span class="hint">清点 / 出货 / 在售状态一目了然</span></div>
+        <div class="stocks" id="stockStats"></div>
+        <div class="slist" id="stockList"></div>
+        <div class="addrow">
+          <input id="stockInput" placeholder="品名，如：红黑格纹衬衫" maxlength="30" style="flex:1;">
+          <input id="stockQty" type="number" placeholder="数量" style="width:64px;">
+          <button id="stockAdd">+ 入库</button>
+        </div>
+      </div>
+
+      <!-- 订单列表 -->
+      <div class="panel">
+        <div class="ph"><span class="no">3</span><h2>订单</h2><span class="hint">状态流转：已接单 → 出图中 → 待交付 → 已交付</span></div>
+        <div class="order-tools">
+          <div class="f"><label>客户</label><input id="oClient" placeholder="客户名 / 备注" style="width:130px;"></div>
+          <div class="f"><label>服装</label><input id="oItem" placeholder="品类+数量" style="width:130px;"></div>
+          <div class="f"><label>金额</label><input id="oAmt" type="number" placeholder="0" style="width:80px;"></div>
+          <button class="add" id="oAdd">+ 记一笔</button>
+        </div>
+        <table class="order-table" id="orderTable"></table>
+        <div class="empty hidden" id="orderEmpty">还没有订单。接第一单后，在这里记录从接单到交付的全过程。</div>
+      </div>
+
+      <!-- 内容复盘 -->
+      <div class="panel">
+        <div class="ph"><span class="no">4</span><h2>内容复盘</h2><span class="hint">每天 5 分钟，复盘出图与引流</span></div>
+        <div class="rv-form">
+          <div class="row"><label>日期</label><input id="rvDate" style="width:130px;"></div>
+          <div class="row"><label>复盘</label><textarea id="rvText" rows="3" placeholder="今天出了几张图？交付几单？闲鱼有没有询单？哪里可以更好？"></textarea></div>
+          <div class="row"><label></label><button class="go" id="rvAdd">保存复盘</button></div>
+        </div>
+        <div class="rv-list" id="rvList"></div>
+      </div>
+    </section>
+
+    <!-- ===== 视图：运动打卡 ===== -->
+    <section class="view" id="view-sport">
+      <div class="sport">
+        <div class="panel">
+          <div class="ph"><span class="no r">1</span><h2>今日运动打卡</h2><span class="hint">选一项动起来，坚持就赢</span></div>
+          <div class="subs" id="sportSubs"></div>
+          <div class="tip" style="margin-top:12px;">居家健身视频：B站搜「居家健身 30 分钟」或「跳绳跟练」，跟着跳就行。</div>
+        </div>
+        <div class="panel">
+          <div class="ph"><span class="no">2</span><h2>一周节奏</h2></div>
+          <div class="quote">
+            <div class="q2" style="font-size:14px;line-height:1.9;">周一 / 三 / 五：跳绳 500 个 + 拉伸<br>周二 / 四：居家健身视频 30 分钟<br>周六：户外快走 40 分钟<br>周日：休息或散步</div>
+            <div class="q3" style="margin-top:8px;">固定时段：晚饭后 30 分钟</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 视图：爆款热点 ===== -->
+    <section class="view" id="view-hot">
+      <div class="panel">
+        <div class="ph"><span class="no r">1</span><h2>爆款热点 · 二次创作</h2><span class="hint">抖音 / B站 / 蝴蝶号快速热门，标记二创进度</span></div>
+        <div class="hlist" id="hotList"></div>
+        <div class="addrow">
+          <input id="hotInput" placeholder="热点 + 二创方向，如：双11主图高峰 → 推主图加急包" maxlength="70">
+          <button id="hotAdd">记一条</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="ph"><span class="no">2</span><h2>爆款灵感库</h2><span class="hint">你的真实案例 + 可添加的观察</span></div>
+        <div class="inspo" id="inspoGrid"></div>
+        <div class="inspo-add">
+          <input id="inspoInput" placeholder="记一条灵感，如：xx品类最近很火，可做体验价引流" maxlength="60">
+          <button id="inspoAdd">记一条</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="ph"><span class="no">3</span><h2>营销节点</h2><span class="hint">按季节提醒你该推什么</span></div>
+        <div class="nodes" id="nodeGrid"></div>
+      </div>
+
+      <div class="gen">
+        <div class="panel">
+          <div class="ph"><span class="no">4</span><h2>文案生成 · 选场景</h2></div>
+          <div class="gen-form">
+            <div class="gf">
+              <label>文案用途</label>
+              <div class="segs" id="genScenes">
+                <button class="seg sel" data-scene="xianyu"><span>闲鱼挂单</span><span class="ps">引流接单</span></button>
+                <button class="seg" data-scene="quote"><span>客户报价</span><span class="ps">报价回复</span></button>
+                <button class="seg" data-scene="moment"><span>朋友圈推广</span><span class="ps">案例展示</span></button>
+                <button class="seg" data-scene="remind"><span>催单跟进</span><span class="ps">交付提醒</span></button>
+              </div>
+            </div>
+            <div class="gf"><label id="genLabel1">服装类型 / 品类</label><input id="genIn1" placeholder="如：红黑格纹衬衫"></div>
+            <div class="gf"><label id="genLabel2">补充信息</label><input id="genIn2" placeholder="如：20件批量 / 3张主图 / 明天交付"></div>
+            <button class="gen-run" id="genRun">生成文案</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="ph"><span class="no">5</span><h2>生成结果</h2><span class="hint">可复制到闲鱼 / 微信</span></div>
+          <div class="gen-out">
+            <div class="oh">生成结果<button class="copy" id="genCopy">复制</button></div>
+            <div class="box empty2" id="genOut">填写左侧信息，点击「生成文案」。</div>
+            <div class="tip">提示：AI 出图成本约 0.2 元/张，售价 30-50 元/张，报价别低于这个底线。</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 视图：备忘录 ===== -->
+    <section class="view" id="view-memo">
+      <div class="panel">
+        <div class="ph"><span class="no r">1</span><h2>备忘录</h2><span class="hint">随手记，别让想法溜走</span></div>
+        <div class="hlist" id="memoList"></div>
+        <div class="addrow">
+          <input id="memoInput" placeholder="记一件事，如：明天给张姐补发源图" maxlength="60">
+          <button id="memoAdd">记一笔</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 视图：AI 课程学习 ===== -->
+    <section class="view" id="view-course">
+      <div class="sport">
+        <div class="panel">
+          <div class="ph"><span class="no r">1</span><h2>今日 AI 课程打卡</h2><span class="hint">每天 30 分钟，学完就勾</span></div>
+          <div class="subs" id="courseSubs"></div>
+        </div>
+        <div class="panel">
+          <div class="ph"><span class="no">2</span><h2>4 周学习路径</h2></div>
+          <div class="path">
+            <div class="pstep"><b>第 1 周</b><span>AI 绘画基础 + 试衣概念</span></div>
+            <div class="pstep"><b>第 2 周</b><span>上手工具：即梦 / Kolors 在线版</span></div>
+            <div class="pstep"><b>第 3 周</b><span>ComfyUI 节点工作流</span></div>
+            <div class="pstep"><b>第 4 周</b><span>商业出图全流程 + 效率</span></div>
+          </div>
+          <div class="tip" style="margin-top:12px;">免费资源：B站搜「ComfyUI 教程」；阿里云 AI 试衣 API 文档 help.aliyun.com；ComfyUI 开源仓库 github.com/comfyanonymous/ComfyUI</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 视图：学习英语 ===== -->
+    <section class="view" id="view-english">
+      <div class="sport">
+        <div class="panel">
+          <div class="ph"><span class="no r">1</span><h2>今日英语打卡</h2><span class="hint">30 分钟：背词 + 听力 + 跟读</span></div>
+          <div class="subs" id="englishSubs"></div>
+        </div>
+        <div class="panel">
+          <div class="ph"><span class="no">2</span><h2>服装 / 电商常用词</h2></div>
+          <div class="words" id="wordList"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- ===== 底部窄屏导航 ===== -->
+<nav class="tabs" id="tabs">
+  <button class="on" data-view="todo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l3 3 8-8"/><path d="M20 12v6a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h9"/></svg>计划</button>
+  <button data-view="sport"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>运动</button>
+  <button data-view="hot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 2L4.5 12.5H11L9.5 22 19 10.5h-6.5z"/></svg>热点</button>
+  <button data-view="course"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 016.5 17H20V2H6.5A2.5 2.5 0 004 4.5z"/><path d="M4 19.5A2.5 2.5 0 006.5 22H20v-5"/></svg>课程</button>
+  <button data-view="english"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 010 18M12 3a15 15 0 000 18"/></svg>英语</button>
+  <button data-view="memo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16M4 10h16M4 15h10M4 20h7"/><path d="M18 15l3 3-4 4h-3v-3z"/></svg>备忘</button>
+</nav>
+<div class="mask" id="mask"></div>
+<div class="drawer" id="drawer">
+  <div class="dh"><b id="dTitle"></b><button class="x" id="dClose" aria-label="关闭">×</button></div>
+  <div class="db" id="dBody"></div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+  var LS_KEY = 'sczt_workbench_v3';
+  function $(id){ return document.getElementById(id); }
+  function esc(s){ return String(s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  var checkSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5 9-10"/></svg>';
+
+  // ===== 默认数据（示例数据，可在页面内增删；本地自动保存） =====
+  function seed(){
+    return {
+      todos: [
+        {t:'回客户消息，确认今天要出的图', done:false, tag:'业务', hot:true},
+        {t:'集中出图 2-3 件，检查效果再交付', done:false, tag:'业务', hot:true},
+        {t:'在闲鱼更新今日在售商品', done:false, tag:'业务', hot:false},
+        {t:'记 1-2 条选题灵感 / 观察', done:false, tag:'业务', hot:false},
+        {t:'更新报价与成本台账', done:false, tag:'业务', hot:false},
+        {t:'整理今日交付案例', done:false, tag:'业务', hot:false},
+        {t:'今日概览：核对日常与创作任务进度', done:false, tag:'必做', hot:true},
+        {t:'选题：记 1-2 个每日灵感', done:false, tag:'创作', hot:false},
+        {t:'刷抖音 / B站 / 蝴蝶号快速热门视频，记 1 条可二创选题', done:false, tag:'创作', hot:false},
+        {t:'内容复盘：复盘今日交付与引流', done:false, tag:'创作', hot:false},
+        {t:'备忘录：清空今日杂事', done:false, tag:'个人', hot:false},
+        {t:'AI 教程学习', done:false, tag:'个人', hot:false},
+        {t:'学习英语', done:false, tag:'个人', hot:false},
+        {t:'每日锻炼 30 分钟', done:false, tag:'习惯', hot:false}
+      ],
+      orders: [
+        {id:1, client:'张姐 · 体验单', item:'红黑格纹衬衫', qty:2, amt:49, status:'s4', date:'11-03'},
+        {id:2, client:'潮牌店主', item:'卫衣批量', qty:20, amt:1500, status:'s2', date:'11-04'},
+        {id:3, client:'电商商家', item:'连衣裙主图', qty:3, amt:597, status:'s3', date:'11-05'},
+        {id:4, client:'李哥 · 体验单', item:'牛仔裤', qty:1, amt:49, status:'s1', date:'11-05'},
+        {id:5, client:'服装工作室', item:'全品类月费', qty:50, amt:2000, status:'s5', date:'11-05'},
+        {id:6, client:'童装店主', item:'全品类批量', qty:80, amt:4800, status:'s4', date:'11-02'}
+      ],
+      inspos: [
+        {type:'img', bg:'bg1', img:'assets/case-flat-1.jpg', t:'客户给平铺图', d:'一张干净的平铺图就能开工，不用模特、不用场地。', tag:'素材'},
+        {type:'img', bg:'bg2', img:'assets/ai-onbody-1.jpg', t:'AI 上身效果', d:'同一件衣服出上身效果，棚拍质感，交付给客户的就是这种。', tag:'出图'},
+        {type:'img', bg:'bg3', img:'assets/case-live-1.jpg', t:'真人实拍参考', d:'客户自己的实拍可以当风格参考，AI 出图贴近本人气质。', tag:'参考'},
+        {type:'txt', t:'体验价 49 元 2 张', d:'首单 2 张验证效果，满意再谈批量——低价引流的入口。', tag:'引流'},
+        {type:'txt', t:'主图/详情页 199-499 元', d:'电商商家刚需，单次 3-5 张，复购率高。', tag:'定价'},
+        {type:'txt', t:'月费 1500-5000 元', d:'锁定服装工作室/网店长期单，每月固定出图量，现金流最稳。', tag:'月费'}
+      ],
+      nodes: [
+        {d:'11.11', n:'双11大促', p:'电商主图/详情页需求高峰，主图加急单最好卖。', a:'推「主图加急包」3 张 199 元起'},
+        {d:'12.12', n:'双12补单潮', p:'大促后商家二次补图，老客户回访的最佳窗口。', a:'回访批量：20-50 件 1000-3000 元'},
+        {d:'1月', n:'年货节·春节前', p:'冬装批量上新 + 礼盒场景图需求集中。', a:'推冬装批量 + 详情页套包'},
+        {d:'2.14', n:'情人节', p:'情侣装、送礼场景图，适合做氛围案例。', a:'朋友圈发情侣装案例引流'},
+        {d:'3月', n:'春装全面上新', p:'全品类上新高峰，50-100 SKU 批量单集中出现。', a:'推全品类 3000-8000 元打包'},
+        {d:'5-6月', n:'毕业季', p:'正装、写真、求职穿搭场景需求。', a:'联合写真馆/正装店推体验价'},
+        {d:'6.18', n:'年中大促', p:'主图详情页备货期，提前 2 周触达电商客户。', a:'提醒老客户提前备图'}
+      ],
+      hot: [
+        {t:'抖音热门：AI 换装 / 试衣效果对比', p:'二创：发平铺→上身案例对比图引流', tag:'抖音', done:false},
+        {t:'B站热门：AI 工具创业教程', p:'二创：记录接单流程 vlog，打造个人 IP', tag:'B站', done:false},
+        {t:'蝴蝶号热门：秋冬换季穿搭上新', p:'二创：推冬装批量 + 详情页套包', tag:'蝴蝶号', done:false},
+        {t:'双11 电商主图需求高峰', p:'二创：推「主图加急包」3 张 199 元起', tag:'抖音话题', done:false}
+      ],
+      reviews: [
+        {d:'11-04', t:'交付 1 单体验图（衬衫），客户满意；闲鱼新增 2 个浏览。明天重点：把批量价目表发给潮牌店主。'}
+      ],
+      memos: [
+        {t:'给张姐补发原图打包'},
+        {t:'问童装店主月底要不要续月费'}
+      ],
+      subs: {},
+      hiddenNav: [],
+      stocks: [
+        {n:'红黑格纹衬衫', q:12},
+        {n:'白色圆领T恤', q:8},
+        {n:'直筒牛仔裤', q:5},
+        {n:'针织开衫', q:3}
+      ]
+    };
+  }
+
+  // ===== 持久化 =====
+  var state;
+  function load(){
+    try{
+      var raw = localStorage.getItem(LS_KEY);
+      if(raw){ var s = JSON.parse(raw); if(s && s.todos && s.orders && s.inspos && s.nodes && s.hot && s.reviews && s.memos){ if(!s.subs) s.subs = {}; if(!s.hiddenNav) s.hiddenNav = []; if(!s.stocks) s.stocks = []; return s; } }
+    }catch(e){}
+    var d = seed();
+    try{ localStorage.setItem(LS_KEY, JSON.stringify(d)); }catch(e){}
+    return d;
+  }
+  function save(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(e){} }
+  state = load();
+
+  // ===== 视图切换 =====
+  var VIEWS = ['todo','sport','hot','course','english','memo'];
+  var TITLES = {todo:'每日计划', sport:'运动打卡', hot:'爆款热点', course:'AI 课程学习', english:'学习英语', memo:'备忘录'};
+  var NAV_DEF = [
+    {k:'todo',  g:'今日', t:'每日计划', c:1, d:'待办 · 订单 · 库存', s:'<path d="M9 11l3 3 8-8"/><path d="M20 12v6a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h9"/>'},
+    {k:'sport', g:'习惯', t:'运动打卡', c:0, d:'跳绳 · 居家健身', s:'<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>'},
+    {k:'hot',   g:'创作', t:'爆款热点', c:1, d:'热点 · 灵感 · 文案', s:'<path d="M13 2L4.5 12.5H11L9.5 22 19 10.5h-6.5z"/>'},
+    {k:'course',g:'学习', t:'AI 课程', c:0, d:'4 周学习路径', s:'<path d="M4 19.5A2.5 2.5 0 016.5 17H20V2H6.5A2.5 2.5 0 004 4.5z"/><path d="M4 19.5A2.5 2.5 0 006.5 22H20v-5"/>'},
+    {k:'english',g:'学习', t:'学习英语', c:0, d:'背词 · 听力 · 跟读', s:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 010 18M12 3a15 15 0 000 18"/>'},
+    {k:'memo',  g:'备忘', t:'备忘录', c:0, d:'随手记 · 清空杂事', s:'<path d="M4 5h16M4 10h16M4 15h10M4 20h7"/><path d="M18 15l3 3-4 4h-3v-3z"/>'}
+  ];
+  function renderNav(){
+    var nav = $('nav'); nav.innerHTML = '';
+    var last = '';
+    NAV_DEF.forEach(function(m){
+      if(state.hiddenNav.indexOf(m.k) >= 0) return;
+      if(m.g !== last){ last = m.g;
+        var cap = document.createElement('div');
+        cap.className = 'cap'; cap.textContent = m.g;
+        nav.appendChild(cap);
+      }
+      var b = document.createElement('button');
+      b.className = 'item';
+      b.setAttribute('data-view', m.k);
+      b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">' + m.s + '</svg><span class="it"><span class="it-t">' + m.t + '</span><span class="it-d">' + (m.d || '') + '</span></span>' + (m.c ? '<i class="core">核心</i>' : '');
+      b.addEventListener('click', function(){ go(b.getAttribute('data-view')); });
+      nav.appendChild(b);
+    });
+  }
+  function renderNavList(){
+    var box = $('navList'); box.innerHTML = '';
+    NAV_DEF.forEach(function(m){
+      var off = state.hiddenNav.indexOf(m.k) >= 0;
+      var row = document.createElement('div');
+      row.className = 'nvrow' + (off ? ' off' : ' on');
+      row.setAttribute('data-k', m.k);
+      row.innerHTML = '<span class="ck">' + checkSvg + '</span><span class="nt">' + m.t + '</span>' + (m.c ? '<span class="ng">核心</span>' : '') + '<span class="ng">' + m.g + '</span>';
+      row.addEventListener('click', function(){
+        var k = row.getAttribute('data-k');
+        var idx = state.hiddenNav.indexOf(k);
+        if(idx >= 0){ state.hiddenNav.splice(idx, 1); } else { state.hiddenNav.push(k); }
+        save(); renderNav(); renderNavList();
+        if(state.hiddenNav.indexOf(activeView()) >= 0) go('todo');
+      });
+      box.appendChild(row);
+    });
+  }
+  function activeView(){
+    for(var i = 0; i < VIEWS.length; i++){ if($('view-' + VIEWS[i]).classList.contains('on')) return VIEWS[i]; }
+    return 'todo';
+  }
+  function go(v){
+    VIEWS.forEach(function(x){ $('view-'+x).classList.toggle('on', x===v); });
+    document.querySelectorAll('.nav .item, #tabs button').forEach(function(b){
+      b.classList.toggle('on', b.getAttribute('data-view')===v);
+    });
+    $('pageTitle').textContent = TITLES[v];
+    window.scrollTo(0,0);
+  }
+  renderNav();
+  renderNavList();
+  document.querySelectorAll('#tabs button').forEach(function(b){
+    b.addEventListener('click', function(){ go(b.getAttribute('data-view')); });
+  });
+  $('navManBtn').addEventListener('click', function(){ $('navMask').classList.add('on'); $('navPanel').classList.add('on'); });
+  $('navClose').addEventListener('click', function(){ $('navMask').classList.remove('on'); $('navPanel').classList.remove('on'); });
+  $('navMask').addEventListener('click', function(){ $('navMask').classList.remove('on'); $('navPanel').classList.remove('on'); });
+
+  // ===== 日期 =====
+  (function(){
+    var now = new Date();
+    var wk = ['日','一','二','三','四','五','六'][now.getDay()];
+    var pad = function(n){ return n<10?'0'+n:''+n; };
+    $('todayLine').innerHTML = now.getFullYear() + ' 年 ' + (now.getMonth()+1) + ' 月 ' + now.getDate() + ' 日 · 星期' + wk + ' · <b>开工</b>';
+  })();
+
+  // ===== 今日计划 =====
+  var QUOTES = [
+    {p:0, q:'今天先出一张图，动起来就有订单。', s:'— 单宸工作台'},
+    {p:50, q:'把今天该出的图出掉，其余都是小事。', s:'— 单宸工作台'},
+    {p:100, q:'今天的活儿干完了，去发条闲鱼。', s:'— 单宸工作台'}
+  ];
+  function todoItemHtml(i){
+    var t = state.todos[i];
+    var num = (i + 1 < 10 ? '0' : '') + (i + 1);
+    return '<button class="chk" data-i="' + i + '" aria-label="完成">' + checkSvg + '</button>' +
+      '<span class="no">' + num + '</span>' +
+      '<span class="tx">' + esc(t.t) + '</span>' +
+      (t.tag ? '<span class="tag' + (t.hot ? '' : ' b') + '">' + esc(t.tag) + '</span>' : '') +
+      '<span class="ar">›</span>' +
+      '<button class="del" data-i="' + i + '" aria-label="删除">×</button>';
+  }
+  function renderTodos(){
+    var total = state.todos.length;
+    var done = 0;
+    state.todos.forEach(function(t){ if(t.done) done++; });
+    var pct = total ? Math.round(done / total * 100) : 0;
+
+    $('todoStats').innerHTML =
+      '<div class="ts"><b>' + total + '</b><span>任务总数</span></div>' +
+      '<div class="ts"><b>' + done + '</b><span>已完成</span></div>' +
+      '<div class="ts red"><b>' + pct + '%</b><span>完成率</span></div>';
+
+    var box = $('todoList'); box.innerHTML = '';
+    var order = ['业务','必做','创作','个人','习惯'];
+    order.forEach(function(g){
+      var idx = [];
+      state.todos.forEach(function(t, i){ if(t.tag === g) idx.push(i); });
+      if(!idx.length) return;
+      var gd = 0;
+      idx.forEach(function(i){ if(state.todos[i].done) gd++; });
+      var head = document.createElement('div');
+      head.className = 'tg';
+      head.innerHTML = '<span class="tn">' + g + '</span><span class="tp">' + gd + ' / ' + idx.length + ' 完成</span>';
+      box.appendChild(head);
+      idx.forEach(function(i){
+        var div = document.createElement('div');
+        div.className = 'todo-item' + (state.todos[i].done ? ' done' : '');
+        div.setAttribute('data-i', i);
+        div.innerHTML = todoItemHtml(i);
+        box.appendChild(div);
+      });
+    });
+    var others = [];
+    state.todos.forEach(function(t, i){ if(order.indexOf(t.tag) < 0) others.push(i); });
+    if(others.length){
+      var gd2 = 0;
+      others.forEach(function(i){ if(state.todos[i].done) gd2++; });
+      var head2 = document.createElement('div');
+      head2.className = 'tg';
+      head2.innerHTML = '<span class="tn">其他</span><span class="tp">' + gd2 + ' / ' + others.length + ' 完成</span>';
+      box.appendChild(head2);
+      others.forEach(function(i){
+        var div = document.createElement('div');
+        div.className = 'todo-item' + (state.todos[i].done ? ' done' : '');
+        div.setAttribute('data-i', i);
+        div.innerHTML = todoItemHtml(i);
+        box.appendChild(div);
+      });
+    }
+    $('todoNum').innerHTML = done + '<small> / ' + total + ' 已完成</small>';
+    $('todoBar').style.width = pct + '%';
+    var q = QUOTES[0];
+    if(pct >= 100){ q = QUOTES[2]; } else if(pct > 0){ q = QUOTES[1]; }
+    $('todayQuote').textContent = q.q;
+    $('quoteSrc').textContent = q.s;
+    $('todoHint').textContent = total ? '点击圆圈勾选完成' : '今天没有待办，加一件吧';
+  }
+
+  // ===== 条目详情抽屉 =====
+  var TODO_DETAILS = [
+    {t:'01 回客户消息', h:'<h4>接单确认四件事</h4><ul><li>看平铺图：模糊 / 反光请客户重拍，否则 AI 上身效果打折</li><li>确认需求：男 / 女模特、场景风格（棚拍 / 街拍）、Logo 是否保留</li><li>报价说清：单品 30-50 元 / 张；批量 20-50 件 1000-3000 元</li><li>给预期：收到，预计 X 小时出图</li></ul><h4>顺手记一笔</h4><ul><li>把客户行业填进订单，以后案例展示用</li></ul>'},
+    {t:'02 集中出图', h:'<h4>出图检查清单</h4><ul><li>衣服纹理：格纹 / 印花要和原图一致</li><li>细节还原：扣子、领型、口袋位置不漂移</li><li>模特自然：身形比例正常，手部不崩</li><li>光线统一：和客户要求的场景氛围一致</li></ul><h4>交付前</h4><ul><li>对照平铺图逐项核一遍，再发客户</li></ul>'},
+    {t:'03 闲鱼更新', h:'<h4>上架三步</h4><ul><li>标题带关键词：AI 服装模特图 / 电商主图 / 换装</li><li>首图用对比案例：平铺→上身，一眼看懂</li><li>价格挂 49 体验价，详情写清交付时效</li></ul><h4>每天</h4><ul><li>擦亮在售商品，询单及时回</li></ul>'},
+    {t:'04 记选题灵感', h:'<h4>看到什么记什么</h4><ul><li>爆款视频：平台 + 话题 + 为什么火</li><li>客户高频问题：问得多就是选题</li><li>同行案例：他发什么有人看</li></ul><h4>去这里记</h4><ul><li>选题灵感模块，每天 1-2 条</li></ul>'},
+    {t:'05 报价与成本台账', h:'<h4>台账要记的</h4><ul><li>单张成本：API 约 0.2 元 / 张（首 400 张免费）</li><li>售价与毛利：30 元售价，成本占比不到 2%</li><li>月账单：API 费用 + 工具订阅</li></ul><h4>每月看一次</h4><ul><li>接单量过 1584 张 / 月，租卡比 API 划算</li></ul>'},
+    {t:'06 整理交付案例', h:'<h4>每单留三张</h4><ul><li>客户平铺图</li><li>AI 上身图</li><li>（如有）真人实拍对比</li></ul><h4>备注</h4><ul><li>客户行业 + 出图风格，报价展示直接用</li></ul>'},
+    {t:'07 今日概览', h:'<h4>一天节奏</h4><ul><li>早：回消息，处理前晚订单</li><li>午：集中出图，检查再交付</li><li>晚：发闲鱼，写复盘，记明天计划</li></ul><h4>进度看这里</h4><ul><li>右侧完成条 = 今天全部日常 + 创作任务</li></ul>'},
+    {t:'08 选题每日灵感', h:'<h4>灵感从哪来</h4><ul><li>抖音 / B站 / 蝴蝶号快速热门</li><li>客户问得最多的问题</li><li>季节节点：换季、大促前</li></ul><h4>落地</h4><ul><li>每天固定记 1-2 条到选题灵感</li></ul>'},
+    {t:'09 热点二创', h:'<h4>刷热三个入口</h4><ul><li>抖音热榜：<a href="https://www.douyin.com/hot" target="_blank">douyin.com/hot</a></li><li>B站热门：<a href="https://www.bilibili.com/v/popular/all" target="_blank">bilibili.com/v/popular/all</a></li><li>蝴蝶号：微信里刷视频号热点</li></ul><h4>判断能不能二创</h4><ul><li>和服装 / AI 出图 / 电商相关就能做</li><li>二创方向：案例对比、接单流程、避坑教程</li></ul><h4>做完标记</h4><ul><li>在热点二创里点待二创→已二创</li></ul>'},
+    {t:'10 内容复盘', h:'<h4>复盘模板（5 分钟）</h4><ul><li>今天出图几张？交付几单？</li><li>闲鱼询单几个？成交几个？</li><li>卡在哪里？明天重点是什么？</li></ul><h4>写这里</h4><ul><li>内容复盘模块，存成记录</li></ul>'},
+    {t:'11 备忘录', h:'<h4>怎么用</h4><ul><li>随手记：客户要求、灵感、杂事</li><li>清空即完成：每天睡前过一遍</li></ul>'},
+    {t:'12 AI 教程学习', h:'<h4>学习路径（每天 30 分钟）</h4><ul><li>第 1 周：AI 绘画基础 + 试衣概念</li><li>第 2 周：上手工具（即梦 / Kolors 在线版）</li><li>第 3 周：ComfyUI 节点工作流</li><li>第 4 周：商业出图全流程 + 效率</li></ul><h4>免费资源</h4><ul><li>B站搜：ComfyUI 教程 / AI 服装模特图</li><li>阿里云 AI 试衣 API 文档：<a href="https://help.aliyun.com/en/aidge/api-aidge-2026-04-28-virtualtryon" target="_blank">help.aliyun.com</a></li><li>ComfyUI 开源仓库：<a href="https://github.com/comfyanonymous/ComfyUI" target="_blank">github.com/comfyanonymous/ComfyUI</a></li></ul><h4>今天</h4><ul><li>看 1 个教程，记 2 个新知识点到备忘录</li></ul>'},
+    {t:'13 学习英语', h:'<h4>每日任务（30 分钟）</h4><ul><li>背 10 个词：优先服装 / 电商词（size、fabric、delivery、sample）</li><li>听 15 分钟：英文购物 / 穿搭类短视频</li><li>跟读 5 分钟：模仿发音和语调</li></ul><h4>工具</h4><ul><li>每日英语听力、英语流利说、B站英语区</li></ul><h4>目标</h4><ul><li>能看懂海外客户询单，回得清</li></ul>'},
+    {t:'14 每日锻炼 30 分钟', h:'<h4>30 分钟安排</h4><ul><li>热身 5 分钟：开合跳 / 原地慢跑</li><li>有氧 15 分钟：跳绳 / 快走 / 骑车</li><li>力量 5 分钟：深蹲 3 组 + 平板支撑</li><li>拉伸 5 分钟：全身放松</li></ul><h4>坚持</h4><ul><li>固定一个时段，比如晚饭后</li></ul>'}
+  ];
+  var SUB_LISTS = {
+    11: [
+      {t:'看 1 个 AI 教程（B站搜 ComfyUI）'},
+      {t:'动手练 1 张出图'},
+      {t:'记 2 个新知识点到备忘录'}
+    ],
+    12: [
+      {t:'背 10 个服装 / 电商英语词'},
+      {t:'听 15 分钟英文穿搭类视频'},
+      {t:'跟读 5 分钟，模仿语调'}
+    ],
+    13: [
+      {t:'热身 5 分钟（开合跳 / 慢跑）'},
+      {t:'有氧 15 分钟（跳绳 / 快走）'},
+      {t:'力量 5 分钟（深蹲 + 平板支撑）'},
+      {t:'拉伸 5 分钟（全身放松）'}
+    ]
+  };
+  function openDetail(i){
+    var d = TODO_DETAILS[i];
+    $('dTitle').textContent = d ? d.t : '待办详情';
+    var body = d ? d.h : '<div class="note">这条是你自己添加的待办，没有固定内容。完成它，或删掉重加。</div>';
+    if(SUB_LISTS[i]){
+      if(!state.subs[i]){ state.subs[i] = SUB_LISTS[i].map(function(s){ return {t:s.t, done:false}; }); save(); }
+      var arr = state.subs[i], sd = 0;
+      arr.forEach(function(s){ if(s.done) sd++; });
+      body += '<h4>今日子任务 <span class="subcnt">' + sd + ' / ' + arr.length + ' 完成</span></h4><div class="subs">';
+      arr.forEach(function(s, si){
+        body += '<div class="sub-c' + (s.done ? ' done' : '') + '" data-k="' + i + '" data-si="' + si + '"><span class="sc">' + checkSvg + '</span><span class="stx">' + esc(s.t) + '</span></div>';
+      });
+      body += '</div>';
+    }
+    $('dBody').innerHTML = body;
+    $('mask').classList.add('on');
+    $('drawer').classList.add('on');
+  }
+  function closeDetail(){
+    $('mask').classList.remove('on');
+    $('drawer').classList.remove('on');
+  }
+  $('dClose').addEventListener('click', closeDetail);
+  $('mask').addEventListener('click', closeDetail);
+  $('dBody').addEventListener('click', function(e){
+    var c = e.target.closest('.sub-c');
+    if(!c) return;
+    var k = +c.getAttribute('data-k'), si = +c.getAttribute('data-si');
+    if(!state.subs[k]) return;
+    state.subs[k][si].done = !state.subs[k][si].done;
+    save(); renderTodos();
+    c.className = 'sub-c' + (state.subs[k][si].done ? ' done' : '');
+    var arr = state.subs[k], sd = 0;
+    arr.forEach(function(s){ if(s.done) sd++; });
+    var cnt = c.parentNode.previousElementSibling.querySelector('.subcnt');
+    if(cnt) cnt.textContent = sd + ' / ' + arr.length + ' 完成';
+  });
+  $('todoList').addEventListener('click', function(e){
+    if(e.target.closest('.chk') || e.target.closest('.del')) return;
+    var item = e.target.closest('.todo-item');
+    if(item) openDetail(+item.getAttribute('data-i'));
+  });
+  $('todoList').addEventListener('click', function(e){
+    var chk = e.target.closest('.chk'), del = e.target.closest('.del');
+    if(chk){ var i = +chk.getAttribute('data-i'); state.todos[i].done = !state.todos[i].done; save(); renderTodos(); }
+    if(del){ var j = +del.getAttribute('data-i'); state.todos.splice(j,1); save(); renderTodos(); }
+  });
+  function addTodo(){
+    var v = $('todoInput').value.trim();
+    if(!v) return;
+    state.todos.push({t:v, done:false, tag:'', hot:false});
+    $('todoInput').value = ''; save(); renderTodos();
+  }
+  $('todoAdd').addEventListener('click', addTodo);
+  $('todoInput').addEventListener('keydown', function(e){ if(e.key === 'Enter') addTodo(); });
+
+  // ===== 订单看板 =====
+  var STATUS = {
+    s1:{t:'已接单', n:'开始出图', next:'s2'},
+    s2:{t:'出图中', n:'完成出图', next:'s3'},
+    s3:{t:'待交付', n:'交付', next:'s4'},
+    s4:{t:'已交付', n:'', next:''},
+    s5:{t:'洽谈中', n:'转为已接单', next:'s1'}
+  };
+  function renderOrders(){
+    var box = $('orderTable');
+    if(!state.orders.length){
+      box.innerHTML = '';
+      $('orderEmpty').classList.remove('hidden');
+      renderStats(); return;
+    }
+    $('orderEmpty').classList.add('hidden');
+    var html = '<tr><th style="width:26%">客户</th><th style="width:24%">服装 · 数量</th><th style="width:14%">金额</th><th style="width:14%">状态</th><th style="width:22%">操作</th></tr>';
+    state.orders.forEach(function(o){
+      var st = STATUS[o.status] || STATUS.s1;
+      html += '<tr>' +
+        '<td class="cli"><b>' + esc(o.client) + '</b><span>' + o.date + ' 记</span></td>' +
+        '<td>' + esc(o.item) + ' · ' + o.qty + ' 张</td>' +
+        '<td class="amt">¥' + o.amt + '</td>' +
+        '<td><span class="st ' + o.status + '">' + st.t + '</span></td>' +
+        '<td class="ops">' +
+          (st.next ? '<button data-id="' + o.id + '" data-next="1">' + st.n + '</button>' : '<span style="font-size:11px;color:var(--line-strong);">已完成</span>') +
+          '<button class="del" data-id="' + o.id + '" data-del="1">删</button>' +
+        '</td></tr>';
+    });
+    box.innerHTML = html;
+    renderStats();
+  }
+  $('orderTable').addEventListener('click', function(e){
+    var adv = e.target.closest('[data-next]'), del = e.target.closest('[data-del]');
+    if(adv){
+      var id = +adv.getAttribute('data-id');
+      state.orders.forEach(function(o){
+        if(o.id === id && STATUS[o.status] && STATUS[o.status].next){
+          o.status = STATUS[o.status].next;
+        }
+      });
+      save(); renderOrders();
+    }
+    if(del){
+      var did = +del.getAttribute('data-id');
+      state.orders = state.orders.filter(function(o){ return o.id !== did; });
+      save(); renderOrders();
+    }
+  });
+  $('oAdd').addEventListener('click', function(){
+    var client = $('oClient').value.trim(), item = $('oItem').value.trim(), amt = parseFloat($('oAmt').value);
+    if(!client){ $('oClient').focus(); return; }
+    if(!(amt > 0)){ $('oAmt').focus(); return; }
+    var now = new Date(), pad = function(n){ return n<10?'0'+n:''+n; };
+    state.orders.unshift({
+      id: Date.now(),
+      client: client,
+      item: item || '未填品类',
+      qty: 1,
+      amt: Math.round(amt),
+      status: 's1',
+      date: pad(now.getMonth()+1) + '-' + pad(now.getDate())
+    });
+    $('oClient').value = ''; $('oItem').value = ''; $('oAmt').value = '';
+    save(); renderOrders();
+  });
+
+  // ===== 统计卡 =====
+  function renderStats(){
+    $('kOrders').textContent = state.orders.length;
+    var income = 0, pending = 0, sheets = 0;
+    state.orders.forEach(function(o){
+      sheets += (o.qty || 0);
+      if(o.status === 's4') income += (o.amt || 0);
+      if(o.status === 's1' || o.status === 's2' || o.status === 's3') pending++;
+    });
+    $('kIncome').textContent = '¥' + income.toLocaleString();
+    $('kPending').innerHTML = pending + ' <small>单</small>';
+    $('kSheets').innerHTML = sheets + ' <small>张</small>';
+  }
+
+  // ===== 爆款灵感 =====
+  function renderInspos(){
+    var box = $('inspoGrid'); box.innerHTML = '';
+    state.inspos.forEach(function(it, i){
+      var div = document.createElement('div');
+      div.className = 'isp';
+      if(it.type === 'img'){
+        div.innerHTML =
+          '<div class="im ' + esc(it.bg || '') + '"><span class="lbl">' + esc(it.tag || '') + '</span></div>' +
+          '<div class="tx"><b>' + esc(it.t) + '</b><span>' + esc(it.d || '') + '</span></div>';
+      } else {
+        div.innerHTML =
+          '<div class="im" style="aspect-ratio:4/3;background:var(--block);display:flex;align-items:center;justify-content:center;color:var(--red);border-bottom:1px solid var(--line);">' +
+          '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l2.1 4.3 4.7.7-3.4 3.3.8 4.7L12 13.8 7.8 16l.8-4.7L5.2 8l4.7-.7z"/></svg></div>' +
+          '<div class="tx"><b>' + esc(it.t) + '</b><span>' + esc(it.d || '') + '</span></div>';
+      }
+      box.appendChild(div);
+    });
+  }
+  $('inspoAdd').addEventListener('click', function(){
+    var v = $('inspoInput').value.trim();
+    if(!v) return;
+    state.inspos.push({type:'txt', t:v, d:'自己记的灵感', tag:'笔记'});
+    $('inspoInput').value = ''; save(); renderInspos();
+  });
+  $('inspoInput').addEventListener('keydown', function(e){ if(e.key === 'Enter'){ $('inspoAdd').click(); } });
+
+  // ===== 营销节点 =====
+  function renderNodes(){
+    var box = $('nodeGrid'); box.innerHTML = '';
+    state.nodes.forEach(function(nd, i){
+      var div = document.createElement('div');
+      div.className = 'node';
+      div.innerHTML =
+        '<button class="x" data-i="' + i + '" aria-label="删除">×</button>' +
+        '<div class="d"><b>' + esc(nd.d) + '</b> · 节点</div>' +
+        '<h3>' + esc(nd.n) + '</h3>' +
+        '<p>' + esc(nd.p) + '</p>' +
+        '<span class="act">' + esc(nd.a) + '</span>';
+      box.appendChild(div);
+    });
+  }
+  $('nodeGrid').addEventListener('click', function(e){
+    var x = e.target.closest('.x');
+    if(x){
+      var i = +x.getAttribute('data-i');
+      state.nodes.splice(i,1); save(); renderNodes();
+    }
+  });
+
+  // ===== 热点二创 =====
+  function renderHots(){
+    var box = $('hotList'); box.innerHTML = '';
+    if(!state.hot.length){ box.innerHTML = '<div class="empty">还没有热点记录，看到能蹭的热点就记一条。</div>'; return; }
+    state.hot.forEach(function(h, i){
+      var div = document.createElement('div');
+      div.className = 'hitem' + (h.done ? ' done' : '');
+      div.innerHTML = '<span class="dot"></span><div class="tx"><b>' + esc(h.t) + '</b><span>' + esc(h.p || '') + '</span></div>' + (h.tag ? '<span class="tag">' + esc(h.tag) + '</span>' : '') + '<button class="st' + (h.done ? ' on' : '') + '" data-i="' + i + '">' + (h.done ? '已二创' : '待二创') + '</button><button class="del" data-i="' + i + '" aria-label="删除">×</button>';
+      box.appendChild(div);
+    });
+  }
+  $('hotAdd').addEventListener('click', function(){
+    var v = $('hotInput').value.trim();
+    if(!v) return;
+    var parts = v.split('→');
+    state.hot.unshift({t: parts[0].trim(), p: parts[1] ? '建议：' + parts[1].trim() : '', tag: '自己记'});
+    $('hotInput').value = ''; save(); renderHots();
+  });
+  $('hotInput').addEventListener('keydown', function(e){ if(e.key === 'Enter'){ $('hotAdd').click(); } });
+  $('hotList').addEventListener('click', function(e){
+    var st = e.target.closest('.st');
+    if(st){
+      var i = +st.getAttribute('data-i');
+      state.hot[i].done = !state.hot[i].done;
+      save(); renderHots(); return;
+    }
+    var del = e.target.closest('.del');
+    if(del){ var i = +del.getAttribute('data-i'); state.hot.splice(i,1); save(); renderHots(); }
+  });
+
+  // ===== 内容复盘 =====
+  function renderReviews(){
+    var box = $('rvList'); box.innerHTML = '';
+    if(!state.reviews.length){ box.innerHTML = '<div class="empty">还没有复盘记录，睡前花 5 分钟写一条。</div>'; return; }
+    state.reviews.forEach(function(r, i){
+      var div = document.createElement('div');
+      div.className = 'rv-item';
+      div.innerHTML = '<div class="d"><b>' + esc(r.d) + '</b>复盘</div><div class="tx">' + esc(r.t) + '</div><button class="del" data-i="' + i + '" aria-label="删除">×</button>';
+      box.appendChild(div);
+    });
+  }
+  $('rvAdd').addEventListener('click', function(){
+    var t = $('rvText').value.trim();
+    if(!t) return;
+    var d = $('rvDate').value.trim() || '今天';
+    state.reviews.unshift({d:d, t:t});
+    $('rvText').value = ''; save(); renderReviews();
+  });
+  $('rvList').addEventListener('click', function(e){
+    var del = e.target.closest('.del');
+    if(del){ var i = +del.getAttribute('data-i'); state.reviews.splice(i,1); save(); renderReviews(); }
+  });
+
+  // ===== 备忘录 =====
+  function renderMemos(){
+    var box = $('memoList'); box.innerHTML = '';
+    if(!state.memos.length){ box.innerHTML = '<div class="empty">备忘录是空的，想到什么记一笔。</div>'; return; }
+    state.memos.forEach(function(m, i){
+      var div = document.createElement('div');
+      div.className = 'hitem';
+      div.innerHTML = '<span class="dot"></span><div class="tx"><b>' + esc(m.t) + '</b></div><button class="del" data-i="' + i + '" aria-label="删除">×</button>';
+      box.appendChild(div);
+    });
+  }
+  $('memoAdd').addEventListener('click', function(){
+    var v = $('memoInput').value.trim();
+    if(!v) return;
+    state.memos.unshift({t:v});
+    $('memoInput').value = ''; save(); renderMemos();
+  });
+  $('memoInput').addEventListener('keydown', function(e){ if(e.key === 'Enter'){ $('memoAdd').click(); } });
+  $('memoList').addEventListener('click', function(e){
+    var del = e.target.closest('.del');
+    if(del){ var i = +del.getAttribute('data-i'); state.memos.splice(i,1); save(); renderMemos(); }
+  });
+
+  // ===== 文案生成 =====
+  var SCENES = {
+    xianyu:{l1:'服装类型 / 品类', l2:'卖点或数量（可留空）', ph1:'如：红黑格纹衬衫', ph2:'如：20 件批量 / 当天出图'},
+    quote:{l1:'服装类型 / 品类', l2:'数量或预算（可留空）', ph1:'如：卫衣', ph2:'如：20 件 / 预算 1000-2000'},
+    moment:{l1:'今天交付了什么', l2:'客户反馈或补充（可留空）', ph1:'如：红黑格纹衬衫上身图', ph2:'如：客户说很满意'},
+    remind:{l1:'客户称呼 / 品类', l2:'订单信息（可留空）', ph1:'如：张姐 / 衬衫', ph2:'如：2 张体验图'}
+  };
+  function buildCopy(scene, a, b){
+    a = a || '（未填写）'; b = b || '';
+    if(scene === 'xianyu'){
+      return '【AI 服装模特图 · 出图接单】\n品类：' + a + (b ? '\n' + b : '') + '\n\n一张平铺图 → 棚拍级上身效果\n✓ 不用模特、不用场地、当天出图\n✓ 30-50 元/张，批量更划算\n✓ 不满意可微调\n\n体验价 49 元 / 2 张，先试效果再谈批量。\n微信：单宸';
+    }
+    if(scene === 'quote'){
+      return '报价参考（' + a + '）：\n- 单品出图：30-50 元/张，2-3 张起做\n- 体验价：49 元 / 2 张（首单）\n' + (b ? '- 按您说的' + b + '：可走批量价，20-50 件 1000-3000 元\n' : '') + '- 全品类月费：1500-5000 元/月\n\n交付规格：高清 JPG，可适配主图/详情页，1-2 天交付，不满意可微调。\n需要的话，我先出一张样图给您看效果。';
+    }
+    if(scene === 'moment'){
+      return '今天交付：' + a + (b ? '，' + b : '') + '。\n客户给一张平铺图，还你棚拍级上身效果。\n\nAI 服装模特图 · 当天出图\n体验价 49 元 2 张，欢迎来试。\n微信：单宸';
+    }
+    return '您好，' + a + ' 的出图已经好了' + (b ? '（' + b + '）' : '') + '，效果图发您，看看是否满意？\n可以微调，确认后我发原图。\n后续批量出图随时找我，单张 30 元起。';
+  }
+  var curScene = 'xianyu';
+  $('genScenes').addEventListener('click', function(e){
+    var seg = e.target.closest('.seg');
+    if(!seg) return;
+    curScene = seg.getAttribute('data-scene');
+    document.querySelectorAll('#genScenes .seg').forEach(function(s){ s.classList.toggle('sel', s === seg); });
+    var sc = SCENES[curScene];
+    $('genLabel1').textContent = sc.l1;
+    $('genLabel2').textContent = sc.l2;
+    $('genIn1').placeholder = sc.ph1;
+    $('genIn2').placeholder = sc.ph2;
+  });
+  $('genRun').addEventListener('click', function(){
+    var txt = buildCopy(curScene, $('genIn1').value.trim(), $('genIn2').value.trim());
+    var box = $('genOut');
+    box.textContent = txt;
+    box.classList.remove('empty2');
+  });
+  $('genCopy').addEventListener('click', function(){
+    var txt = $('genOut').textContent;
+    if(!txt || txt.indexOf('填写左侧信息') === 0) return;
+    var ta = document.createElement('textarea');
+    ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    var ok = false;
+    try{ ok = document.execCommand('copy'); }catch(e){}
+    document.body.removeChild(ta);
+    this.textContent = ok ? '已复制 ✓' : '复制失败，请手动长按复制';
+    var self = this;
+    setTimeout(function(){ self.textContent = '复制'; }, 1600);
+  });
+
+  // ===== 库存看板 =====
+  function renderStocks(){
+    var arr = state.stocks;
+    var sku = arr.length, qty = 0, low = 0;
+    arr.forEach(function(s){ qty += s.q; if(s.q <= 2) low++; });
+    $('stockStats').innerHTML =
+      '<div class="ts"><b>' + sku + '</b><span>SKU 数</span></div>' +
+      '<div class="ts"><b>' + qty + '</b><span>总件数</span></div>' +
+      '<div class="ts' + (low ? ' red' : '') + '"><b>' + low + '</b><span>需补货</span></div>';
+    var box = $('stockList'); box.innerHTML = '';
+    if(!arr.length){ box.innerHTML = '<div class="empty">还没有库存。加一件入库，开始管你的货。</div>'; return; }
+    arr.forEach(function(s, i){
+      var row = document.createElement('div');
+      row.className = 'sitem' + (s.q <= 2 ? ' low' : '');
+      row.innerHTML =
+        '<span class="sn">' + esc(s.n) + '</span>' +
+        '<span class="sq">' + s.q + ' 件</span>' +
+        '<button class="sop" data-i="' + i + '" data-d="1" aria-label="入库">+1</button>' +
+        '<button class="sop out" data-i="' + i + '" data-d="-1" aria-label="出货">出货</button>' +
+        '<button class="sdel" data-i="' + i + '" aria-label="删除">×</button>';
+      box.appendChild(row);
+    });
+  }
+  $('stockAdd').addEventListener('click', function(){
+    var n = $('stockInput').value.trim();
+    var q = parseInt($('stockQty').value, 10) || 1;
+    if(!n) return;
+    state.stocks.push({n:n, q:Math.max(1,q)});
+    $('stockInput').value = ''; $('stockQty').value = '';
+    save(); renderStocks();
+  });
+  $('stockList').addEventListener('click', function(e){
+    var b = e.target.closest('.sop');
+    if(b){
+      var i = +b.getAttribute('data-i'), d = +b.getAttribute('data-d');
+      state.stocks[i].q = Math.max(0, state.stocks[i].q + d);
+      save(); renderStocks(); return;
+    }
+    var x = e.target.closest('.sdel');
+    if(x){ var j = +x.getAttribute('data-i'); state.stocks.splice(j,1); save(); renderStocks(); }
+  });
+
+  // ===== 学习 / 运动视图打卡（复用子任务数据） =====
+  function renderSubView(key, id){
+    if(!state.subs[key]){ state.subs[key] = SUB_LISTS[key].map(function(s){ return {t:s.t, done:false}; }); save(); }
+    var box = $(id); if(!box) return;
+    var arr = state.subs[key], sd = 0;
+    arr.forEach(function(s){ if(s.done) sd++; });
+    var html = '<div class="ph2"><span>今日任务</span><span class="subcnt">' + sd + ' / ' + arr.length + ' 完成</span></div><div class="subs">';
+    arr.forEach(function(s, si){
+      html += '<div class="sub-c' + (s.done ? ' done' : '') + '" data-k="' + key + '" data-si="' + si + '"><span class="sc">' + checkSvg + '</span><span class="stx">' + esc(s.t) + '</span></div>';
+    });
+    html += '</div>';
+    box.innerHTML = html;
+  }
+  [['sportSubs',13],['courseSubs',11],['englishSubs',12]].forEach(function(p){
+    $(p[0]).addEventListener('click', function(e){
+      var c = e.target.closest('.sub-c'); if(!c) return;
+      var k = +c.getAttribute('data-k'), si = +c.getAttribute('data-si');
+      state.subs[k][si].done = !state.subs[k][si].done;
+      save(); renderTodos(); renderSubView(k, p[0]);
+    });
+  });
+
+  // ===== 英语常用词表 =====
+  var WORDS = [
+    ['size','尺码'],['fabric','面料'],['delivery','发货'],['sample','样品'],['bulk order','批量订单'],
+    ['price','价格'],['discount','折扣'],['inventory','库存'],['out of stock','缺货'],['return','退货'],
+    ['cotton','棉'],['linen','亚麻'],['sleeve','袖子'],['collar','领子'],['pattern','图案'],
+    ['wholesale','批发'],['shipment','发货'],['receipt','收货'],['invoice','发票'],['quality','质量']
+  ];
+  function renderWords(){
+    var box = $('wordList'); if(!box) return;
+    var html = '';
+    WORDS.forEach(function(w){ html += '<div class="wd"><b>' + w[0] + '</b><span>' + w[1] + '</span></div>'; });
+    box.innerHTML = html;
+  }
+
+  // ===== 首渲染 =====
+  renderTodos();
+  renderOrders();
+  renderInspos();
+  renderNodes();
+  renderHots();
+  renderReviews();
+  renderMemos();
+  renderStocks();
+  renderSubView(13, 'sportSubs');
+  renderSubView(11, 'courseSubs');
+  renderSubView(12, 'englishSubs');
+  renderWords();
+  (function(){
+    var now = new Date(), pad = function(n){ return n<10?'0'+n:''+n; };
+    $('rvDate').value = (now.getMonth()+1) + '-' + pad(now.getDate());
+  })();
+})();
+</script>
+</body>
+</html>

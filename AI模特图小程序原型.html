@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI模特图小程序原型</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2316130F'/%3E%3Cpath d='M7 10l3-4h12l3 4v12l-4 4h-4v-8h-4v8h-4l-4-4V10z' fill='none' stroke='%23C8102E' stroke-width='2.2' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+  :root{
+    --paper:#FAF9F7;--ink:#16130F;--ink-soft:#3B352D;--gray:#6B6259;
+    --line:#E4DED6;--line-strong:#C9C1B6;--red:#C8102E;--red-deep:#8F0B20;--block:#F1EDE6;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",system-ui,sans-serif;background:#E9E4DC;color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;}
+  button{font-family:inherit;border:none;cursor:pointer;background:none;color:inherit;}
+  img{display:block;}
+
+  /* ===== 手机壳 ===== */
+  .phone{max-width:430px;margin:0 auto;background:var(--paper);min-height:100vh;position:relative;box-shadow:0 0 40px rgba(0,0,0,.18);}
+  @media (min-width:768px){.phone{margin:24px auto;min-height:860px;border-radius:28px;overflow:hidden;}}
+
+  .statusbar{display:flex;align-items:center;justify-content:space-between;padding:10px 18px 6px;font-size:12px;color:var(--gray);letter-spacing:.04em;background:var(--paper);}
+  .appbar{display:flex;align-items:center;gap:8px;padding:4px 16px 12px;}
+  .appbar .back{width:36px;height:36px;display:flex;align-items:center;justify-content:center;color:var(--ink);}
+  .appbar .back svg{width:20px;height:20px;}
+  .appbar .ttl{font-size:17px;font-weight:800;letter-spacing:.03em;flex:1;}
+  .appbar .step{font-size:12px;color:var(--gray);}
+
+  /* ===== 视图 ===== */
+  .view{display:none;padding:0 18px 96px;}
+  .view.on{display:block;}
+  .hidden{display:none !important;}
+
+  /* ===== 首页 ===== */
+  .hero{background:var(--ink);color:#fff;margin:0 -18px;padding:22px 18px 26px;position:relative;overflow:hidden;}
+  .hero .brand{display:flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.22em;color:#C9C0B4;}
+  .hero .brand .tag{background:var(--red);color:#fff;padding:3px 10px;letter-spacing:.14em;font-size:11px;}
+  .hero h1{font-size:30px;font-weight:800;margin-top:12px;line-height:1.25;letter-spacing:.01em;}
+  .hero .sub{font-size:14px;color:#C9C0B4;margin-top:8px;letter-spacing:.08em;}
+  .hero .price{display:inline-block;margin-top:14px;background:var(--red);padding:6px 14px;font-size:17px;font-weight:800;}
+  .hero .mini{font-size:11.5px;color:#9A9188;margin-top:8px;letter-spacing:.05em;}
+  .case{padding:16px 0 4px;}
+  .case .cap{font-size:12px;color:var(--gray);letter-spacing:.1em;margin-bottom:10px;text-align:center;}
+  .case .pair{display:flex;gap:8px;align-items:stretch;}
+  .case .pair .fig{flex:1;background:var(--block);border:1px solid var(--line);}
+  .case .pair img{width:100%;aspect-ratio:3/4;object-fit:cover;}
+  .case .pair .fig span{display:block;font-size:11px;color:var(--gray);text-align:center;padding:5px 2px;letter-spacing:.06em;}
+  .case .pair .ar{align-self:center;color:var(--red);font-weight:800;font-size:20px;flex:none;}
+
+  .blk{margin-top:16px;}
+  .blk h2{font-size:16px;font-weight:800;display:flex;align-items:center;gap:8px;letter-spacing:.02em;}
+  .blk h2 .no{width:22px;height:22px;border-radius:50%;background:var(--ink);color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;flex:none;}
+  .feats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;}
+  .feat{background:var(--block);padding:10px 6px;text-align:center;}
+  .feat b{display:block;font-size:13px;}
+  .feat span{font-size:11px;color:var(--gray);}
+  .prices{margin-top:10px;border:1px solid var(--line);}
+  .prices .row{display:flex;justify-content:space-between;gap:8px;padding:10px 12px;border-bottom:1px dashed var(--line);font-size:13px;}
+  .prices .row:last-child{border-bottom:none;}
+  .prices .row .p{color:var(--red);font-weight:800;white-space:nowrap;}
+
+  /* ===== 制作 ===== */
+  .steps{display:flex;gap:4px;margin:2px 0 14px;}
+  .steps .s{flex:1;height:3px;background:var(--line);}
+  .steps .s.on{background:var(--red);}
+  .mk{background:#fff;border:1px solid var(--line);padding:14px;margin-bottom:12px;}
+  .mk .t{font-size:14px;font-weight:800;display:flex;align-items:center;gap:7px;}
+  .mk .t .no{width:19px;height:19px;border-radius:50%;background:var(--red);color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;flex:none;}
+  .mk .t .hint{margin-left:auto;font-size:11px;color:var(--gray);font-weight:400;}
+  .drop{margin-top:10px;border:1.5px dashed var(--line-strong);padding:16px 10px;text-align:center;background:var(--paper);}
+  .drop .ico{width:34px;height:34px;margin:0 auto 6px;color:var(--red);}
+  .drop .l1{font-size:13px;font-weight:700;}
+  .drop .l2{font-size:11px;color:var(--gray);margin-top:2px;}
+  .upwrap{display:none;margin-top:10px;gap:10px;align-items:stretch;}
+  .upwrap.on{display:flex;}
+  .upwrap .upimg{flex:1;background:var(--block);border:1px solid var(--line);position:relative;overflow:hidden;}
+  .upwrap .upimg img{width:100%;aspect-ratio:3/4;object-fit:cover;}
+  .upwrap .upimg span{display:block;font-size:10.5px;color:var(--gray);text-align:center;padding:4px 2px;}
+  .upwrap .delflag{flex:none;display:flex;align-items:center;justify-content:center;}
+  .upwrap .delflag button{border:1px solid var(--line-strong);padding:7px 10px;font-size:12px;color:var(--gray);}
+  .models{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;}
+  .model{border:1.5px solid var(--line);padding:10px 2px;text-align:center;background:#fff;}
+  .model .av{width:34px;height:34px;margin:0 auto 6px;border-radius:50%;background:var(--block);display:flex;align-items:center;justify-content:center;color:var(--ink);}
+  .model b{display:block;font-size:12px;}
+  .model span{font-size:10.5px;color:var(--gray);}
+  .model.sel{border-color:var(--red);background:#FBF1F2;}
+  .model.sel .av{background:var(--red);color:#fff;}
+  .mecard{display:flex;align-items:center;gap:10px;width:100%;margin-top:8px;text-align:left;padding:10px 12px;border:1.5px solid var(--line);background:#fff;}
+  .mecard .av{width:38px;height:38px;flex:none;}
+  .mecard .tx{flex:1;min-width:0;}
+  .mecard b{display:block;font-size:13px;}
+  .mecard span{font-size:11px;color:var(--gray);}
+  .mecard .chk{margin-left:auto;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--line-strong);flex:none;display:flex;align-items:center;justify-content:center;}
+  .mecard .chk svg{width:12px;height:12px;color:#fff;}
+  .mecard.sel{border-color:var(--red);background:#FBF1F2;}
+  .mecard.sel .av{background:var(--red);color:#fff;}
+  .mecard.sel .chk{background:var(--red);border-color:var(--red);}
+  .meform-row{display:flex;gap:10px;margin-top:10px;}
+  .meform-row .field{flex:1;border:1.5px solid var(--line);background:#fff;padding:8px 10px;}
+  .meform-row .field label{display:block;font-size:11px;color:var(--gray);}
+  .meform-row .field input{width:100%;border:none;outline:none;font-size:15px;font-weight:700;background:none;color:var(--ink);padding:2px 0;font-family:inherit;}
+  .skins{display:flex;gap:8px;margin-top:10px;}
+  .skin{flex:1;border:1.5px solid var(--line);background:#fff;padding:9px 2px;text-align:center;font-size:12px;}
+  .skin.sel{border-color:var(--red);background:#FBF1F2;font-weight:800;}
+  .meup{margin-top:10px;display:flex;gap:10px;align-items:center;}
+  .meup img{width:56px;height:70px;object-fit:cover;border:1px solid var(--line);}
+  .meup button{border:1px solid var(--line-strong);padding:8px 12px;font-size:12px;color:var(--gray);background:#fff;}
+  .opts{margin-top:10px;}
+  .optrow{display:flex;gap:8px;}
+  .opt{flex:1;border:1.5px solid var(--line);padding:10px 4px;text-align:center;background:#fff;font-size:12.5px;}
+  .opt .ps{display:block;font-size:10.5px;color:var(--gray);margin-top:2px;}
+  .opt.sel{border-color:var(--red);background:#FBF1F2;font-weight:800;}
+  .qty{display:flex;align-items:center;gap:14px;margin-top:10px;}
+  .qty .lab{font-size:12.5px;color:var(--ink-soft);}
+  .qty .ctl{display:flex;align-items:center;border:1px solid var(--line-strong);border-radius:4px;overflow:hidden;margin-left:auto;}
+  .qty .ctl button{width:36px;height:36px;font-size:18px;color:var(--ink);}
+  .qty .ctl b{width:40px;text-align:center;font-size:15px;}
+  .total{display:flex;justify-content:space-between;align-items:baseline;background:var(--block);padding:12px 14px;margin-top:12px;}
+  .total .t1{font-size:12.5px;color:var(--ink-soft);}
+  .total .t2{font-size:22px;font-weight:800;color:var(--red);}
+  .total .t2 small{font-size:12px;font-weight:400;color:var(--gray);}
+
+  /* ===== 生成 ===== */
+  .genload{padding:46px 0 20px;text-align:center;}
+  .ring{width:52px;height:52px;margin:0 auto 16px;border-radius:50%;border:4px solid var(--line);border-top-color:var(--red);animation:spin 1s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .genload .l1{font-size:15px;font-weight:800;}
+  .genload .l2{font-size:12px;color:var(--gray);margin-top:4px;}
+  .genres{padding-top:6px;}
+  .genres .cmp{display:flex;gap:10px;align-items:stretch;}
+  .genres .cmp .fig{flex:1;background:var(--block);border:1px solid var(--line);}
+  .genres .cmp img{width:100%;aspect-ratio:3/4;object-fit:cover;}
+  .genres .cmp .fig span{display:block;font-size:11px;color:var(--gray);text-align:center;padding:5px 2px;}
+  .genres .cmp .ar{align-self:center;color:var(--red);font-weight:800;font-size:20px;flex:none;}
+  .genres .note{margin-top:10px;font-size:11.5px;color:var(--gray);background:var(--block);padding:8px 10px;border-left:3px solid var(--line-strong);}
+  .genres .tagline{margin-top:10px;font-size:13px;color:var(--ink-soft);}
+
+  /* ===== 下单 ===== */
+  .ord{border:1px solid var(--line);background:#fff;}
+  .ord .row{display:flex;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px dashed var(--line);font-size:13px;}
+  .ord .row:last-child{border-bottom:none;}
+  .ord .row .k{color:var(--gray);}
+  .ord .row .v{font-weight:700;text-align:right;}
+  .pay{margin-top:14px;border:1px solid var(--line);background:#fff;}
+  .pay .ph{font-size:13px;font-weight:800;padding:12px 14px;border-bottom:1px solid var(--line);}
+  .pay .opt{display:flex;align-items:center;gap:10px;padding:13px 14px;border-bottom:1px dashed var(--line);}
+  .pay .opt:last-child{border-bottom:none;}
+  .pay .opt .ic{width:22px;height:22px;color:#0BB85C;flex:none;}
+  .pay .opt b{font-size:13.5px;}
+  .pay .opt .ck{margin-left:auto;width:19px;height:19px;border-radius:50%;border:1.5px solid var(--line-strong);display:flex;align-items:center;justify-content:center;}
+  .pay .opt .ck svg{width:11px;height:11px;color:#fff;}
+  .pay .opt.sel .ck{background:var(--red);border-color:var(--red);}
+
+  /* ===== 成功 ===== */
+  .done{padding-top:40px;text-align:center;}
+  .done .ok{width:64px;height:64px;margin:0 auto 16px;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;}
+  .done .ok svg{width:30px;height:30px;}
+  .done h2{font-size:20px;font-weight:800;}
+  .done .sub{font-size:13px;color:var(--gray);margin-top:6px;}
+  .done .card{margin:20px 0 0;background:#fff;border:1px solid var(--line);padding:16px 14px;text-align:left;}
+  .done .card .row{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px dashed var(--line);}
+  .done .card .row:last-child{border-bottom:none;}
+  .done .card .k{color:var(--gray);}
+  .done .contact{margin-top:16px;background:var(--ink);color:#fff;padding:16px 14px;text-align:left;}
+  .done .contact .t{font-size:13px;color:#C9C0B4;letter-spacing:.12em;}
+  .done .contact .v{font-size:16px;font-weight:800;margin-top:4px;}
+  .done .contact .v2{font-size:13px;color:#9A9188;margin-top:2px;}
+
+  /* ===== 我的 ===== */
+  .mine .me{display:flex;align-items:center;gap:12px;padding:16px;background:#fff;border:1px solid var(--line);}
+  .mine .me .av{width:46px;height:46px;border-radius:50%;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;flex:none;}
+  .mine .me b{font-size:15px;}
+  .mine .me span{display:block;font-size:11.5px;color:var(--gray);}
+  .mine .list{margin-top:12px;background:#fff;border:1px solid var(--line);}
+  .mine .list .row{display:flex;align-items:center;gap:10px;padding:13px 14px;border-bottom:1px solid var(--line);font-size:13.5px;}
+  .mine .list .row:last-child{border-bottom:none;}
+  .mine .list .row .ic{width:18px;height:18px;color:var(--red);flex:none;}
+  .mine .list .row .ar{margin-left:auto;color:var(--line-strong);}
+  .mine .od{margin-top:12px;background:#fff;border:1px solid var(--line);}
+  .mine .od .head{display:flex;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--line);font-size:12px;color:var(--gray);}
+  .mine .od .body{display:flex;gap:10px;padding:12px 14px;align-items:center;}
+  .mine .od img{width:52px;height:66px;object-fit:cover;border:1px solid var(--line);}
+  .mine .od .info{flex:1;min-width:0;}
+  .mine .od .info b{font-size:13px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .mine .od .info span{font-size:11.5px;color:var(--gray);}
+  .mine .od .st{font-size:12px;color:var(--red);font-weight:700;flex:none;}
+
+  /* ===== 底部操作 & 导航 ===== */
+  .cta{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;padding:12px 18px calc(12px + env(safe-area-inset-bottom));background:var(--paper);border-top:1px solid var(--line);z-index:30;}
+  .cta .btn{display:block;width:100%;padding:14px 0;background:var(--red);color:#fff;font-size:16px;font-weight:800;letter-spacing:.1em;text-align:center;}
+  .cta .btn.sec{background:var(--ink);}
+  .cta .btn.ghost{background:var(--block);color:var(--ink-soft);font-weight:600;}
+  .cta .btn:disabled{opacity:.4;cursor:not-allowed;}
+  .tabbar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;display:flex;background:var(--paper);border-top:1px solid var(--line);z-index:30;padding-bottom:env(safe-area-inset-bottom);}
+  .tabbar .tab{flex:1;padding:8px 0 9px;text-align:center;color:var(--gray);font-size:11px;}
+  .tabbar .tab .ic{width:21px;height:21px;margin:0 auto 2px;color:var(--gray);}
+  .tabbar .tab.on{color:var(--red);}
+  .tabbar .tab.on .ic{color:var(--red);}
+
+  /* ===== 支付弹层 ===== */
+  .mask{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:50;display:none;}
+  .mask.on{display:block;}
+  .sheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:#fff;z-index:60;border-radius:16px 16px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom));display:none;}
+  .sheet.on{display:block;}
+  .sheet .ph{font-size:15px;font-weight:800;text-align:center;}
+  .sheet .amt{text-align:center;font-size:30px;font-weight:800;color:var(--ink);margin-top:12px;}
+  .sheet .amt small{font-size:14px;color:var(--gray);font-weight:400;}
+  .sheet .meta{margin-top:14px;border-top:1px dashed var(--line);padding-top:10px;font-size:12.5px;color:var(--gray);}
+  .sheet .meta .row{display:flex;justify-content:space-between;padding:4px 0;}
+  .sheet .btns{display:flex;gap:10px;margin-top:16px;}
+  .sheet .btns .btn{flex:1;padding:13px 0;text-align:center;font-size:15px;font-weight:700;}
+  .sheet .btns .cancel{background:var(--block);color:var(--ink-soft);}
+  .sheet .btns .okpay{background:#0BB85C;color:#fff;}
+
+  /* toast */
+  .toast{position:fixed;top:18%;left:50%;transform:translateX(-50%);background:rgba(22,19,15,.92);color:#fff;font-size:13px;padding:9px 16px;border-radius:4px;z-index:90;display:none;max-width:80%;text-align:center;}
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <!-- 状态栏 -->
+  <div class="statusbar"><span>AI 视觉定制</span><span>9:41</span></div>
+
+  <!-- 顶栏 -->
+  <div class="appbar">
+    <button class="back" id="backBtn" aria-label="返回">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+    </button>
+    <div class="ttl" id="appbarTitle">AI 服装模特图</div>
+    <div class="step" id="appbarStep"></div>
+  </div>
+
+  <main>
+    <!-- ===== 视图：首页 ===== -->
+    <section class="view on" id="v-home">
+      <div class="hero">
+        <div class="brand"><span class="tag">AI 视觉定制</span> 服装模特图</div>
+        <h1>把服装平铺图<br>变成真人上身效果</h1>
+        <div class="sub">上传一张平铺图，AI 生成模特上身效果</div>
+        <span class="price">体验价 49 元 / 件</span>
+        <div class="mini">含 2 张图（正面+侧面）· 2 小时交付</div>
+      </div>
+      <div class="case">
+        <div class="cap">真实案例 · 同一件衬衫</div>
+        <div class="pair">
+          <div class="fig"><img src="assets/case-flat-1.jpg" alt="客户提供的衬衫平铺图"><span>客户素材</span></div>
+          <div class="ar">→</div>
+          <div class="fig"><img src="assets/ai-onbody-1.jpg" alt="AI生成的上身效果"><span>AI 上身</span></div>
+        </div>
+      </div>
+      <div class="blk">
+        <h2><span class="no">1</span>服务内容</h2>
+        <div class="feats">
+          <div class="feat"><b>换装出图</b><span>平铺图→上身图</span></div>
+          <div class="feat"><b>多规格</b><span>主图/详情页/3:4</span></div>
+          <div class="feat"><b>批量交付</b><span>一套模特库</span></div>
+        </div>
+      </div>
+      <div class="blk">
+        <h2><span class="no">2</span>价格</h2>
+        <div class="prices">
+          <div class="row"><span>体验价（1 件 2 张）</span><span class="p">49 元</span></div>
+          <div class="row"><span>批量换装（20–50 件）</span><span class="p">1000–3000 元</span></div>
+          <div class="row"><span>主图 / 详情页</span><span class="p">199–499 元</span></div>
+          <div class="row"><span>月度合作</span><span class="p">1500–5000 元/月</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 视图：制作 ===== -->
+    <section class="view" id="v-make">
+      <div class="steps"><div class="s on"></div><div class="s"></div><div class="s"></div><div class="s"></div></div>
+      <div class="mk">
+        <div class="t"><span class="no">1</span>上传服装图<span class="hint">平铺图 / 样衣实拍均可</span></div>
+        <label class="drop" id="dropArea">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <div class="l1">点击选择图片</div>
+          <div class="l2">支持 JPG / PNG · 白底或光线均匀为佳</div>
+          <input type="file" id="fileInput" accept="image/*" style="display:none">
+        </label>
+        <div class="upwrap" id="upwrap">
+          <div class="upimg"><img id="upImg" alt="已上传的服装图"><span id="upImgCap">已上传</span></div>
+          <div class="upimg hidden" id="demoFlatWrap"><img src="assets/case-flat-1.jpg" alt="示例平铺图"><span>示例图</span></div>
+          <div class="delflag"><button id="clearUp" type="button">更换</button></div>
+        </div>
+        <button class="drop" id="useDemo" style="margin-top:10px;width:100%;border-style:solid;color:var(--red);font-size:12.5px;font-weight:700;">没有图？用示例平铺图试试</button>
+      </div>
+      <div class="mk">
+        <div class="t"><span class="no">2</span>选择模特<span class="hint">体型可自由填写</span></div>
+        <div class="models" id="modelGrid">
+          <button class="model" data-m="本人模特"><span class="av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg></span><b>本人模特</b><span>上传照片</span></button>
+          <button class="model sel" data-m="男模"><span class="av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg></span><b>男模</b><span>自由设定体型</span></button>
+          <button class="model" data-m="女模"><span class="av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg></span><b>女模</b><span>自由设定体型</span></button>
+        </div>
+      </div>
+      <div class="mk" id="bodyCard">
+        <div class="t"><span class="no" style="background:var(--ink);">+</span>体型信息<span class="hint" id="bodyHint">身高体重肤色任意填</span></div>
+        <div class="meform-row">
+          <div class="field"><label>身高 (cm)</label><input type="number" id="meH" min="120" max="220" placeholder="如 175"></div>
+          <div class="field"><label>体重 (kg)</label><input type="number" id="meW" min="30" max="200" placeholder="如 65"></div>
+        </div>
+        <div class="skins" id="skinRow">
+          <button class="skin sel" data-s="自然">自然</button>
+          <button class="skin" data-s="白皙">白皙</button>
+          <button class="skin" data-s="小麦">小麦</button>
+          <button class="skin" data-s="深色">深色</button>
+        </div>
+        <div class="meup hidden" id="meUpWrap">
+          <img id="meUpImg" alt="本人照片">
+          <button id="meUpBtn" type="button">上传本人照片</button>
+        </div>
+      </div>
+      <input type="file" id="meFile" accept="image/*" style="display:none">
+      <div class="mk">
+        <div class="t"><span class="no">3</span>角度与数量</div>
+        <div class="opts">
+          <div class="optrow">
+            <button class="opt sel" data-a="front">正面<span class="ps">含 1 张</span></button>
+            <button class="opt" data-a="side">侧面<span class="ps">含 1 张</span></button>
+            <button class="opt" data-a="back">背面<span class="ps">+15 元</span></button>
+          </div>
+        </div>
+        <div class="qty">
+          <span class="lab">件数</span>
+          <div class="ctl">
+            <button id="qMinus" type="button">−</button>
+            <b id="qtyVal">1</b>
+            <button id="qPlus" type="button">+</button>
+          </div>
+        </div>
+        <div class="total"><span class="t1">预估费用</span><span class="t2" id="totalVal">¥49<small> 含 2 张</small></span></div>
+      </div>
+    </section>
+
+    <!-- ===== 视图：生成 ===== -->
+    <section class="view" id="v-gen">
+      <div class="steps"><div class="s on"></div><div class="s on"></div><div class="s"></div><div class="s"></div></div>
+      <div class="genload hidden" id="genLoading">
+        <div class="ring"></div>
+        <div class="l1">AI 生成中…</div>
+        <div class="l2">换装模型处理中，约需 1–3 分钟</div>
+      </div>
+      <div class="genres hidden" id="genResult">
+        <div class="tagline">同一件服装：你提供的素材 → AI 生成结果</div>
+        <div class="cmp" style="margin-top:10px;">
+          <div class="fig" id="genInputWrap"><img id="genInput" src="assets/case-flat-1.jpg" alt="客户素材"><span id="genInputCap">客户素材</span></div>
+          <div class="ar">→</div>
+          <div class="fig"><img src="assets/ai-onbody-1.jpg" alt="AI生成的上身效果图"><span>AI 出图 · 上身效果</span></div>
+        </div>
+        <div class="note">演示原型：页面为流程示意，真实小程序中此处由 AI 模型生成实际换装效果。</div>
+        <div class="tagline">已选：<span id="genMeta"></span></div>
+      </div>
+    </section>
+
+    <!-- ===== 视图：下单 ===== -->
+    <section class="view" id="v-order">
+      <div class="steps"><div class="s on"></div><div class="s on"></div><div class="s on"></div><div class="s"></div></div>
+      <div class="ord">
+        <div class="row"><span class="k">服务</span><span class="v">AI 服装模特图（体验价）</span></div>
+        <div class="row"><span class="k">件数</span><span class="v" id="oQty">1 件</span></div>
+        <div class="row"><span class="k">角度</span><span class="v" id="oAngle">正面 + 侧面</span></div>
+        <div class="row"><span class="k">模特</span><span class="v" id="oModel">男模·标准</span></div>
+        <div class="row"><span class="k">交付</span><span class="v">2 小时 · 含 2 轮修改</span></div>
+        <div class="row"><span class="k">合计</span><span class="v" id="oTotal" style="color:var(--red);font-size:17px;">¥49</span></div>
+      </div>
+      <div class="pay">
+        <div class="ph">支付方式</div>
+        <div class="opt sel">
+          <svg class="ic" viewBox="0 0 24 24" fill="currentColor"><path d="M3 7.5C3 6.1 4.1 5 5.5 5h13C19.9 5 21 6.1 21 7.5v9c0 1.4-1.1 2.5-2.5 2.5h-13C4.1 19 3 17.9 3 16.5v-9zM5 10h14v1.5H5V10zm0 3h14v1.5H5V13z"/></svg>
+          <b>微信支付</b>
+          <span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+        </div>
+      </div>
+      <div class="note" style="margin-top:10px;font-size:11.5px;color:var(--gray);">提交后由人工核对素材并开始制作，如有透明面料等复杂情况会先与您沟通。</div>
+    </section>
+
+    <!-- ===== 视图：成功 ===== -->
+    <section class="view" id="v-done">
+      <div class="done">
+        <div class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <h2>订单已提交</h2>
+        <div class="sub">预计 2 小时内交付初稿，请留意微信通知</div>
+        <div class="card">
+          <div class="row"><span class="k">订单号</span><span id="dNo">AI20261105</span></div>
+          <div class="row"><span class="k">金额</span><span id="dAmt">¥49</span></div>
+          <div class="row"><span class="k">状态</span><span style="color:var(--red);font-weight:700;">制作中</span></div>
+        </div>
+        <div class="contact">
+          <div class="t">联系客服</div>
+          <div class="v">微信：单辰</div>
+          <div class="v">电话：加微信后提供</div>
+          <div class="v2">发图核对素材 · 批量长期合作可议价</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 视图：我的 ===== -->
+    <section class="view" id="v-mine">
+      <div class="mine">
+        <div class="me">
+          <div class="av">单</div>
+          <div><b>单辰</b><span>微信：单辰 · 电话：加微信后提供</span></div>
+        </div>
+        <div class="od">
+          <div class="head"><span>进行中的订单</span><span id="mineSt">制作中</span></div>
+          <div class="body">
+            <img src="assets/case-live-1.jpg" alt="订单示例图">
+            <div class="info"><b>AI 服装模特图 · 红黑格纹衬衫</b><span>1 件 · 正面+侧面 · ¥49</span></div>
+            <div class="st">制作中</div>
+          </div>
+        </div>
+        <div class="list">
+          <div class="row"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>全部订单<span class="ar">›</span></div>
+          <div class="row"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8v5l3 2"/></svg>联系客服<span class="ar">›</span></div>
+          <div class="row"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9 10l3-3 3 3"/></svg>发布须知<span class="ar">›</span></div>
+          <div class="row"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.5-2-3.5-2.4 1a7 7 0 0 0-1.7-1L14.5 3h-5l-.3 2.5a7 7 0 0 0-1.7 1L5.1 5.5l-2 3.5L5.1 10.5a7 7 0 0 0 0 2L3 14l2 3.5 2.4-1a7 7 0 0 0 1.7 1l.3 2.5h5l.3-2.5a7 7 0 0 0 1.7-1l2.4 1 2-3.5-2-1.5c.07-.32.1-.66.1-1z"/></svg>设置<span class="ar">›</span></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 底部 CTA（流程页） -->
+  <div class="cta hidden" id="ctaBar">
+    <button class="btn" id="ctaBtn">开始制作</button>
+  </div>
+  <!-- 底部 Tab（首页/我的） -->
+  <div class="tabbar" id="tabBar">
+    <button class="tab on" data-tab="home"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 10.5L12 3l9 7.5V21a1 1 0 0 1-1 1h-5v-7h-6v7H4a1 1 0 0 1-1-1v-10.5z"/></svg></span>首页</button>
+    <button class="tab" data-tab="make"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/></svg></span>制作</button>
+    <button class="tab" data-tab="mine"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg></span>我的</button>
+  </div>
+
+  <!-- 支付弹层 -->
+  <div class="mask" id="payMask"></div>
+  <div class="sheet" id="paySheet">
+    <div class="ph">确认支付</div>
+    <div class="amt"><small>¥</small><span id="payAmt">49</span></div>
+    <div class="meta">
+      <div class="row"><span>收款方</span><span>AI 视觉定制 · 单辰</span></div>
+      <div class="row"><span>商品</span><span>AI 服装模特图</span></div>
+    </div>
+    <div class="btns">
+      <button class="btn cancel" id="payCancel">取消</button>
+      <button class="btn okpay" id="payOk">确认支付</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  /* ===== 状态 ===== */
+  var state = {
+    view: "home",          // home | make | gen | order | done | mine
+    hasFile: false,        // 是否已选图（上传或示例）
+    useUpload: false,      // 用的是上传图还是示例图
+    model: "男模",
+    mePhoto: null,         // 本人模特照片 dataURL
+    meH: "",
+    meW: "",
+    meSkin: "自然",
+    back: false,           // 是否含背面
+    qty: 1,
+    paid: false,
+    genStarted: false
+  };
+  var BASE = 49, BACK_ADD = 15;
+
+  /* ===== DOM ===== */
+  var $ = function(id){ return document.getElementById(id); };
+  var views = { home: $("v-home"), make: $("v-make"), gen: $("v-gen"), order: $("v-order"), done: $("v-done"), mine: $("v-mine") };
+  var titles = { home: "AI 服装模特图", make: "开始制作", gen: "生成结果", order: "确认订单", done: "下单成功", mine: "我的" };
+  var tabMap = { home: "home", mine: "mine", make: "make" };
+
+  /* ===== 视图切换 ===== */
+  function showView(v){
+    state.view = v;
+    Object.keys(views).forEach(function(k){ views[k].classList.toggle("on", k === v); });
+    $("appbarTitle").textContent = titles[v];
+    $("appbarStep").textContent = (v === "make") ? "1 / 3" : (v === "gen") ? "2 / 3" : (v === "order") ? "3 / 3" : (v === "done") ? "已完成" : "";
+    $("backBtn").style.visibility = (v === "home" || v === "mine") ? "hidden" : "visible";
+    // 底部栏
+    var flow = (v === "make" || v === "gen" || v === "order");
+    $("ctaBar").classList.toggle("hidden", !flow);
+    $("tabBar").classList.toggle("hidden", flow || v === "done");
+    if (v === "done"){ $("ctaBar").classList.add("hidden"); }
+    var btns = $("tabBar").querySelectorAll(".tab");
+    for (var i = 0; i < btns.length; i++){
+      var on = (v === "home" && btns[i].getAttribute("data-tab") === "home") ||
+               (v === "make" && btns[i].getAttribute("data-tab") === "make") ||
+               (v === "mine" && btns[i].getAttribute("data-tab") === "mine");
+      btns[i].classList.toggle("on", on);
+    }
+    // CTA 文案与状态
+    var cta = $("ctaBtn");
+    if (v === "make"){
+      cta.textContent = "生成预览";
+      cta.disabled = !state.hasFile;
+      cta.className = "btn";
+    } else if (v === "gen"){
+      cta.textContent = "确认下单";
+      cta.className = "btn";
+      cta.disabled = !state.genStarted;
+    } else if (v === "order"){
+      cta.textContent = "提交订单 · ¥" + calcTotal();
+      cta.className = "btn";
+      cta.disabled = false;
+    }
+    window.scrollTo(0, 0);
+  }
+
+  /* ===== 价格 ===== */
+  function calcTotal(){
+    var per = BASE + (state.back ? BACK_ADD : 0);
+    return per * state.qty;
+  }
+  function angleLabel(){
+    var parts = ["正面"];
+    if (state.back){ parts.push("背面"); } else { parts.push("侧面"); }
+    return parts.join(" + ");
+  }
+  function renderPrice(){
+    var per = BASE + (state.back ? BACK_ADD : 0);
+    var t = per * state.qty;
+    var extra = state.qty * (state.back ? 2 : 2);
+    $("totalVal").innerHTML = "¥" + t + "<small> 含 " + (state.qty * 2) + " 张</small>";
+    $("qtyVal").textContent = state.qty;
+  }
+
+  /* ===== 上传 ===== */
+  $("fileInput").addEventListener("change", function(e){
+    var f = e.target.files && e.target.files[0];
+    if (!f) return;
+    var reader = new FileReader();
+    reader.onload = function(ev){
+      $("upImg").src = ev.target.result;
+      state.hasFile = true;
+      state.useUpload = true;
+      refreshUpWrap();
+      refreshCta();
+    };
+    reader.readAsDataURL(f);
+  });
+  $("dropArea").addEventListener("click", function(e){
+    if (e.target !== $("fileInput")){ $("fileInput").click(); }
+  });
+  $("useDemo").addEventListener("click", function(){
+    state.hasFile = true;
+    state.useUpload = false;
+    $("upImg").removeAttribute("src");
+    refreshUpWrap();
+    refreshCta();
+  });
+  $("clearUp").addEventListener("click", function(){
+    state.hasFile = false;
+    $("fileInput").value = "";
+    $("upImg").removeAttribute("src");
+    refreshUpWrap();
+    refreshCta();
+  });
+  function refreshUpWrap(){
+    $("upwrap").classList.toggle("on", state.hasFile);
+    $("demoFlatWrap").classList.toggle("hidden", !(state.hasFile && !state.useUpload));
+    $("upImgCap").textContent = state.useUpload ? "已上传" : "示例图";
+  }
+  function refreshCta(){
+    $("ctaBtn").disabled = !state.hasFile;
+  }
+
+  /* ===== 模特选择 ===== */
+  var models = $("modelGrid").querySelectorAll(".model");
+  for (var mi = 0; mi < models.length; mi++){
+    (function(btn){
+      btn.addEventListener("click", function(){
+        for (var j = 0; j < models.length; j++){ models[j].classList.remove("sel"); }
+        btn.classList.add("sel");
+        state.model = btn.getAttribute("data-m");
+        var isMe = (state.model === "本人模特");
+        $("bodyHint").textContent = isMe ? "上传照片并用下方信息生成" : "身高体重肤色任意填";
+        $("meUpWrap").classList.toggle("hidden", !isMe);
+      });
+    })(models[mi]);
+  }
+
+  /* ===== 体型信息 ===== */
+  $("meH").addEventListener("input", function(){ state.meH = this.value; });
+  $("meW").addEventListener("input", function(){ state.meW = this.value; });
+  var skins = $("skinRow").querySelectorAll(".skin");
+  for (var si = 0; si < skins.length; si++){
+    (function(btn){
+      btn.addEventListener("click", function(){
+        for (var j = 0; j < skins.length; j++){ skins[j].classList.remove("sel"); }
+        btn.classList.add("sel");
+        state.meSkin = btn.getAttribute("data-s");
+      });
+    })(skins[si]);
+  }
+  $("meUpBtn").addEventListener("click", function(){ $("meFile").click(); });
+  $("meFile").addEventListener("change", function(e){
+    var f = e.target.files && e.target.files[0];
+    if (!f) return;
+    var reader = new FileReader();
+    reader.onload = function(ev){
+      state.mePhoto = ev.target.result;
+      $("meUpImg").src = state.mePhoto;
+      $("meUpImg").classList.remove("hidden");
+      $("meUpBtn").textContent = "更换照片";
+    };
+    reader.readAsDataURL(f);
+  });
+  function modelLabel(){
+    var parts = [state.model];
+    if (state.meH){ parts.push(state.meH + "cm"); }
+    if (state.meW){ parts.push(state.meW + "kg"); }
+    parts.push((state.meSkin || "自然") + "肤色");
+    return parts.join(" · ");
+  }
+
+  /* ===== 角度 ===== */
+  var opts = document.querySelectorAll("#v-make .opt");
+  for (var oi = 0; oi < opts.length; oi++){
+    (function(btn){
+      btn.addEventListener("click", function(){
+        for (var j = 0; j < opts.length; j++){ opts[j].classList.remove("sel"); }
+        btn.classList.add("sel");
+        state.back = (btn.getAttribute("data-a") === "back");
+        renderPrice();
+      });
+    })(opts[oi]);
+  }
+
+  /* ===== 数量 ===== */
+  $("qMinus").addEventListener("click", function(){
+    if (state.qty > 1){ state.qty--; renderPrice(); }
+  });
+  $("qPlus").addEventListener("click", function(){
+    if (state.qty < 20){ state.qty++; renderPrice(); }
+  });
+
+  /* ===== CTA 主按钮 ===== */
+  $("ctaBtn").addEventListener("click", function(){
+    if (state.view === "make"){
+      if (!state.hasFile){ toast("请先上传服装图或使用示例图"); return; }
+      if (state.model === "本人模特" && !state.mePhoto){ toast("请先上传本人照片"); return; }
+      startGen();
+    } else if (state.view === "gen"){
+      fillOrder();
+      showView("order");
+    } else if (state.view === "order"){
+      openPay();
+    }
+  });
+
+  /* ===== 生成模拟 ===== */
+  function startGen(){
+    showView("gen");
+    state.genStarted = false;
+    $("genLoading").classList.remove("hidden");
+    $("genResult").classList.add("hidden");
+    // 输入图：上传图优先，否则示例图（示例图从 DOM 静态引用拷贝）
+    if (state.useUpload && $("upImg").src){
+      $("genInput").src = $("upImg").src;
+      $("genInputCap").textContent = "已上传素材";
+    } else {
+      var demoEl = $("demoFlatWrap").querySelector("img");
+      if (demoEl){ $("genInput").src = demoEl.src; }
+      $("genInputCap").textContent = "示例平铺图";
+    }
+    $("genMeta").textContent = modelLabel() + " · " + angleLabel() + " · " + state.qty + " 件";
+    setTimeout(function(){
+      $("genLoading").classList.add("hidden");
+      $("genResult").classList.remove("hidden");
+      state.genStarted = true;
+      $("ctaBtn").disabled = false;
+    }, 1800);
+  }
+
+  /* ===== 下单 ===== */
+  function fillOrder(){
+    $("oQty").textContent = state.qty + " 件";
+    $("oAngle").textContent = angleLabel() + (state.qty > 1 ? "（每件）" : "");
+    $("oModel").textContent = modelLabel();
+    $("oTotal").textContent = "¥" + calcTotal();
+  }
+  $("payCancel").addEventListener("click", closePay);
+  $("payMask").addEventListener("click", closePay);
+  $("payOk").addEventListener("click", function(){
+    closePay();
+    state.paid = true;
+    var no = "AI" + Date.now().toString().slice(-8);
+    $("dNo").textContent = no;
+    $("dAmt").textContent = "¥" + calcTotal();
+    showView("done");
+  });
+  function openPay(){
+    $("payAmt").textContent = calcTotal();
+    $("payMask").classList.add("on");
+    $("paySheet").classList.add("on");
+  }
+  function closePay(){
+    $("payMask").classList.remove("on");
+    $("paySheet").classList.remove("on");
+  }
+
+  /* ===== 返回 & Tab ===== */
+  $("backBtn").addEventListener("click", function(){
+    if (state.view === "make"){ showView("home"); }
+    else if (state.view === "gen"){ showView("make"); }
+    else if (state.view === "order"){ showView("gen"); }
+    else if (state.view === "done"){ showView("home"); }
+  });
+  var tabs = $("tabBar").querySelectorAll(".tab");
+  for (var ti = 0; ti < tabs.length; ti++){
+    (function(btn){
+      btn.addEventListener("click", function(){
+        var t = btn.getAttribute("data-tab");
+        if (t === "home"){ showView("home"); }
+        else if (t === "make"){ showView("make"); }
+        else if (t === "mine"){ showView("mine"); }
+      });
+    })(tabs[ti]);
+  }
+  // 我的页列表项：演示反馈
+  var mineRows = document.querySelectorAll("#v-mine .list .row");
+  for (var ri = 0; ri < mineRows.length; ri++){
+    (function(btn){
+      btn.addEventListener("click", function(){
+        toast("演示原型：此功能尚未接入");
+      });
+    })(mineRows[ri]);
+  }
+
+  /* ===== toast ===== */
+  var toastTimer = null;
+  function toast(msg){
+    var el = $("toast");
+    el.textContent = msg;
+    el.style.display = "block";
+    if (toastTimer){ clearTimeout(toastTimer); }
+    toastTimer = setTimeout(function(){ el.style.display = "none"; }, 1800);
+  }
+
+  /* ===== 初始化 ===== */
+  showView("home");
+  renderPrice();
+})();
+</script>
+</body>
+</html>

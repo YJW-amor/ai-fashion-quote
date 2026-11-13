@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI服装模特图服务 · 物料总览</title>
+<meta name="description" content="AI服装模特图服务物料总览：服务报价单、小程序原型、闲鱼九宫格素材、单宸工作台。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2316130F'/%3E%3Cpath d='M7 10l3-4h12l3 4v12l-4 4h-4v-8h-4v8h-4l-4-4V10z' fill='none' stroke='%23C8102E' stroke-width='2.2' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+  :root{
+    --paper:#FAF9F7;
+    --ink:#16130F;
+    --ink-soft:#3B352D;
+    --gray:#6B6259;
+    --line:#E4DED6;
+    --line-strong:#C9C0B4;
+    --red:#C8102E;
+    --red-deep:#8F0B20;
+    --block:#F1EDE6;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",system-ui,sans-serif;
+    background:var(--paper);color:var(--ink);
+    line-height:1.65;-webkit-font-smoothing:antialiased;
+  }
+  .sheet{max-width:860px;margin:0 auto;padding:0 20px 56px;}
+
+  /* 顶条 */
+  .topbar{
+    background:var(--ink);color:#fff;display:flex;justify-content:space-between;
+    align-items:center;padding:10px 14px;margin:16px 0 0;
+    font-size:13px;letter-spacing:.06em;
+  }
+  .topbar .left{display:flex;align-items:center;gap:8px;}
+  .topbar svg{width:16px;height:16px;}
+  .topbar .no{color:var(--line-strong);font-variant-numeric:tabular-nums;}
+
+  /* 头部 */
+  .head{padding:30px 2px 22px;border-bottom:3px double var(--ink);}
+  .head .kicker{
+    display:inline-block;font-size:12px;letter-spacing:.28em;color:var(--red);
+    border:1px solid var(--red);padding:3px 10px;margin-bottom:14px;
+  }
+  .head h1{font-size:31px;line-height:1.25;font-weight:800;letter-spacing:.02em;}
+  .head h1 .sub{
+    display:block;font-size:15px;font-weight:400;color:var(--ink-soft);
+    letter-spacing:.14em;margin-top:8px;
+  }
+  .head .meta{
+    display:flex;flex-wrap:wrap;gap:8px 24px;margin-top:16px;
+    font-size:13px;color:var(--gray);font-variant-numeric:tabular-nums;
+  }
+  .head .meta b{color:var(--ink);font-weight:600;}
+
+  /* 物料卡片 */
+  .grid{display:grid;grid-template-columns:1fr;gap:14px;margin:26px 0 0;}
+  @media (min-width:768px){.grid{grid-template-columns:1fr 1fr;}}
+  .card{
+    display:flex;flex-direction:column;background:#fff;border:1px solid var(--line);
+    border-top:3px solid var(--ink);padding:20px 20px 18px;text-decoration:none;
+    color:inherit;transition:border-color .18s ease,transform .18s ease,box-shadow .18s ease;
+  }
+  .card:hover{border-top-color:var(--red);transform:translateY(-2px);box-shadow:0 8px 20px rgba(22,19,15,.07);}
+  .card .idx{
+    font-size:12px;font-weight:700;letter-spacing:.16em;color:var(--red);
+    font-variant-numeric:tabular-nums;
+  }
+  .card .t{font-size:18px;font-weight:700;margin-top:6px;letter-spacing:.01em;}
+  .card .d{font-size:13px;color:var(--gray);margin-top:8px;flex:1;}
+  .card .go{
+    font-size:13px;color:var(--ink);border-top:1px solid var(--line);
+    margin-top:16px;padding-top:12px;display:flex;justify-content:space-between;
+    align-items:center;letter-spacing:.04em;
+  }
+  .card .go .arw{color:var(--red);font-weight:700;}
+
+  /* 联系栏 */
+  .contact{margin-top:34px;border:1px solid var(--line);background:var(--block);}
+  .contact .hd{
+    display:flex;align-items:baseline;gap:12px;padding:14px 18px;
+    border-bottom:1px solid var(--line-strong);
+  }
+  .contact .hd .idx{font-size:13px;font-weight:700;color:var(--red);letter-spacing:.1em;}
+  .contact .hd h2{font-size:17px;font-weight:700;}
+  .contact .rows{padding:6px 18px 14px;}
+  .contact .row{
+    display:flex;gap:18px;padding:9px 0;font-size:14px;
+    border-bottom:1px dashed var(--line);
+  }
+  .contact .row:last-child{border-bottom:0;}
+  .contact .lbl{width:64px;color:var(--gray);letter-spacing:.06em;flex:none;}
+  .contact .val{color:var(--ink);font-variant-numeric:tabular-nums;}
+
+  footer{
+    margin-top:28px;padding-top:16px;border-top:1px solid var(--line);
+    font-size:12px;color:var(--gray);display:flex;justify-content:space-between;
+    flex-wrap:wrap;gap:8px;letter-spacing:.04em;
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <div class="topbar">
+    <div class="left">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M7 10l3-4h12l3 4v12l-4 4h-4v-8h-4v8h-4l-4-4V10z" fill="none" stroke="#C8102E" stroke-width="2.2" stroke-linejoin="round"/></svg>
+      <span>单宸 · AI服装模特图</span>
+    </div>
+    <div class="no">物料总览 / INDEX</div>
+  </div>
+
+  <header class="head">
+    <span class="kicker">AI FASHION MODEL</span>
+    <h1>AI 服装模特图服务<span class="sub">服务物料总览</span></h1>
+    <div class="meta">
+      <span>服务方 <b>单宸</b></span>
+      <span>交付物 <b>4 份</b></span>
+      <span>更新 <b>2026-11</b></span>
+    </div>
+  </header>
+
+  <div class="grid">
+    <a class="card" href="AI服装模特图服务报价单.html">
+      <span class="idx">01 / QUOTE</span>
+      <span class="t">服务报价单</span>
+      <span class="d">套餐分档、单价对比、交付标准与下单流程，可直接发给客户。</span>
+      <span class="go">查看报价单 <span class="arw">→</span></span>
+    </a>
+
+    <a class="card" href="AI模特图小程序原型.html">
+      <span class="idx">02 / PROTOTYPE</span>
+      <span class="t">小程序原型</span>
+      <span class="d">从上传服装图到选择模特、生成成片的完整交互流程演示。</span>
+      <span class="go">查看原型 <span class="arw">→</span></span>
+    </a>
+
+    <a class="card" href="闲鱼9宫格素材.html">
+      <span class="idx">03 / MATERIAL</span>
+      <span class="t">闲鱼九宫格素材</span>
+      <span class="d">面向二手平台推广的九宫格方图素材，含文案与排版。</span>
+      <span class="go">查看素材 <span class="arw">→</span></span>
+    </a>
+
+    <a class="card" href="单宸工作台.html">
+      <span class="idx">04 / WORKBENCH</span>
+      <span class="t">单宸工作台</span>
+      <span class="d">订单、素材与交付进度的一体化管理面板。</span>
+      <span class="go">查看工作台 <span class="arw">→</span></span>
+    </a>
+  </div>
+
+  <section class="contact">
+    <div class="hd">
+      <span class="idx">联系</span>
+      <h2>咨询与下单</h2>
+    </div>
+    <div class="rows">
+      <div class="row"><span class="lbl">微信</span><span class="val">单辰</span></div>
+      <div class="row"><span class="lbl">电话</span><span class="val">加微信后提供</span></div>
+    </div>
+  </section>
+
+  <footer>
+    <span>AI服装模特图服务 · 物料总览</span>
+    <span>GitHub Pages 在线预览</span>
+  </footer>
+
+</div>
+</body>
+</html>

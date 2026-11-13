@@ -1,0 +1,46 @@
+{
+  "task": "AI服装模特图服务报价单",
+  "brief_path": ".creative-design/quote-demo/brief.md",
+  "brief_version": "v1",
+  "frozen": true,
+  "assets": [
+    {
+      "asset_id": "demo-compare",
+      "purpose": "报价单03效果示意区：左服装平铺图、右模特上身效果的左右对照示意图",
+      "method": "image_gen",
+      "reference_inputs": [],
+      "prompt": "一张左右对照的商业服装效果示意图：画面左半部分是干净纯白背景上平铺的一件米色针织连衣裙，正面朝上、平整无褶皱、构图居中；画面右半部分是同一款米色针织连衣裙穿在一位亚洲女性模特身上，模特站在浅灰色摄影棚背景前，正面站立姿态，自然柔光，电商服装模特图风格。左右两半在画面中央以细直线分隔，整体构图对称，写实、干净、商业感强，画面中不出现任何文字。",
+      "target_ratio": "3:2",
+      "target_size": "1536x1024",
+      "safe_area": "主体完整不贴边",
+      "consumer": "报价单 .demo 效果示意区",
+      "postprocess": "none",
+      "acceptance": "左右对照关系清晰，服装一致，无文字，主体完整，写实商业感",
+      "status": "pending",
+      "output": null
+    },
+    {
+      "asset_id": "real-case-onbody",
+      "purpose": "真实案例区右侧图：同一件红黑格纹衬衫的AI模特上身效果图，与用户提供的平铺原图并排作左右对比",
+      "method": "image_edit",
+      "reference_inputs": [
+        {"role": "identity", "uri": "https://aka.doubaocdn.com/s/tRvXLDbWzM", "note": "用户上传红黑格纹衬衫平铺图（正面、衣架悬挂），作为服装身份来源"}
+      ],
+      "prompt": "以参考图中的红黑格纹长袖衬衫为唯一服装身份来源，保持红黑格纹图案、翻领、黑色纽扣、宽松版型与颜色完全一致。一位身材匀称的年轻男模特穿着这件衬衫，站在浅米色干净棚拍背景前，正面站立、半身构图，衬衫自然垂落、微敞领口，双手自然垂放。柔和均匀棚拍光线，轻微接触阴影，面料格纹纹理清晰真实，红黑格纹细节精准还原。保持衬衫完整、不增删配饰，画面中不出现任何文字。",
+      "target_ratio": "3:4",
+      "target_size": "900x1200",
+      "safe_area": "模特与衬衫完整不贴边",
+      "consumer": "报价单真实案例区、闲鱼9宫格格1首图",
+      "postprocess": "none",
+      "acceptance": "衬衫身份与平铺图一致，上身效果自然，无文字，写实商业感",
+      "status": "generated",
+      "output": {
+        "url": "https://aka.doubaocdn.com/s/XoSqhRxgtx",
+        "local": "assets/ai-onbody-1.jpg",
+        "size": "1773x2364",
+        "checked": "红黑格纹、翻领、黑色纽扣与平铺图一致；无文字；浅米色背景干净",
+        "adopted": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI服装模特图服务报价单</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2316130F'/%3E%3Cpath d='M7 10l3-4h12l3 4v12l-4 4h-4v-8h-4v8h-4l-4-4V10z' fill='none' stroke='%23C8102E' stroke-width='2.2' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+  :root{
+    --paper:#FAF9F7;
+    --ink:#16130F;
+    --ink-soft:#3B352D;
+    --gray:#6B6259;
+    --line:#E4DED6;
+    --line-strong:#C9C0B4;
+    --red:#C8102E;
+    --red-deep:#8F0B20;
+    --block:#F1EDE6;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:auto;}
+  body{
+    font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",system-ui,sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  .sheet{max-width:860px;margin:0 auto;padding:0 20px 48px;}
+
+  /* ===== 顶条 ===== */
+  .topbar{
+    background:var(--ink);color:#fff;
+    display:flex;justify-content:space-between;align-items:center;
+    padding:10px 14px;margin:16px 0 0;
+    font-size:13px;letter-spacing:.06em;
+  }
+  .topbar .left{display:flex;align-items:center;gap:8px;}
+  .topbar svg{width:16px;height:16px;}
+  .topbar .no{color:#C9C0B4;font-variant-numeric:tabular-nums;}
+
+  /* ===== 头部 ===== */
+  .head{padding:28px 2px 20px;border-bottom:3px double var(--ink);}
+  .head .kicker{
+    display:inline-block;font-size:12px;letter-spacing:.28em;color:var(--red);
+    border:1px solid var(--red);padding:3px 10px;margin-bottom:14px;
+  }
+  .head h1{font-size:30px;line-height:1.25;font-weight:800;letter-spacing:.02em;}
+  .head h1 .sub{display:block;font-size:16px;font-weight:400;color:var(--ink-soft);letter-spacing:.14em;margin-top:6px;}
+  .head .meta{
+    display:flex;flex-wrap:wrap;gap:8px 24px;margin-top:16px;
+    font-size:13px;color:var(--gray);font-variant-numeric:tabular-nums;
+  }
+  .head .meta b{color:var(--ink);font-weight:600;}
+
+  /* ===== 对比带 ===== */
+  .compare{display:grid;grid-template-columns:1fr;gap:10px;margin:22px 0;}
+  @media (min-width:768px){.compare{grid-template-columns:1fr 1fr;}}
+  .cmp{background:var(--block);padding:16px 18px;border-left:4px solid var(--line-strong);}
+  .cmp.old{border-left-color:var(--gray);}
+  .cmp.new{border-left-color:var(--red);}
+  .cmp .t{font-size:13px;color:var(--gray);letter-spacing:.1em;}
+  .cmp .num{font-size:30px;font-weight:800;margin-top:2px;font-variant-numeric:tabular-nums;}
+  .cmp.old .num{color:var(--gray);}
+  .cmp.new .num{color:var(--red);}
+  .cmp .d{font-size:13px;color:var(--ink-soft);margin-top:4px;}
+
+  /* ===== 章节标题 ===== */
+  .sec{display:flex;align-items:baseline;gap:12px;margin:34px 0 14px;}
+  .sec .idx{font-size:13px;font-weight:700;color:var(--red);letter-spacing:.1em;}
+  .sec h2{font-size:20px;font-weight:800;letter-spacing:.04em;}
+  .sec .line{flex:1;height:1px;background:var(--line-strong);}
+
+  /* ===== 服务项目表 ===== */
+  table.items{width:100%;border-collapse:collapse;table-layout:fixed;font-size:14px;}
+  .items col:nth-child(1){width:34%;}
+  .items col:nth-child(2){width:44%;}
+  .items col:nth-child(3){width:22%;}
+  .items th{
+    text-align:left;font-size:12px;font-weight:600;color:var(--gray);
+    letter-spacing:.14em;padding:8px 10px;border-bottom:2px solid var(--ink);
+  }
+  .items td{padding:13px 10px;border-bottom:1px solid var(--line);vertical-align:top;}
+  .items td:first-child{font-weight:700;}
+  .items .desc{font-size:12.5px;color:var(--gray);margin-top:2px;line-height:1.55;}
+  .items .price{font-size:19px;font-weight:800;color:var(--red);white-space:normal;font-variant-numeric:tabular-nums;line-height:1.4;}
+  .items .price small{font-size:11px;font-weight:400;color:var(--gray);white-space:nowrap;}
+  .items .price small{font-size:11px;font-weight:400;color:var(--gray);}
+  .items tr.hot{background:#FBF3EC;}
+  .items tr.hot td:first-child{color:var(--red-deep);}
+  .tag-hot{display:inline-block;font-size:10px;color:#fff;background:var(--red);padding:1px 6px;border-radius:2px;margin-left:6px;vertical-align:2px;letter-spacing:.08em;}
+
+  /* ===== 规格 ===== */
+  .spec{background:var(--block);padding:16px 18px;}
+  .spec h3{font-size:13px;letter-spacing:.12em;color:var(--ink-soft);margin-bottom:10px;font-weight:700;}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;}
+  .chip{font-size:13px;border:1px solid var(--line-strong);padding:4px 12px;color:var(--ink-soft);background:#fff;}
+  .chip b{color:var(--ink);}
+  .spec .note{margin-top:12px;font-size:12.5px;color:var(--gray);}
+
+  /* ===== 效果示意 ===== */
+  .demo{background:var(--ink);color:#fff;padding:16px;}
+  .demo .cap{font-size:12px;color:#C9C0B4;letter-spacing:.14em;margin-top:8px;text-align:center;}
+  .demo img{width:100%;max-width:640px;display:block;margin:0 auto;background:#2A2621;}
+  .demo .foot{margin-top:10px;font-size:11.5px;color:#9A9188;text-align:center;}
+  .demo .case2{display:flex;align-items:stretch;gap:10px;max-width:640px;margin:0 auto;}
+  .demo .case2 figure{flex:1;margin:0;background:#2A2621;border:1px solid #3A342B;}
+  .demo .case2 img{width:100%;display:block;object-fit:cover;aspect-ratio:3/4;}
+  .demo .case2 figcaption{font-size:11.5px;color:#C9C0B4;text-align:center;padding:6px 4px;letter-spacing:.08em;}
+  .demo .case2 .arrow{align-self:center;color:var(--red);font-size:24px;font-weight:800;flex:none;}
+
+  /* ===== 流程时间轴 ===== */
+  .tl{display:grid;grid-template-columns:44px 1fr;row-gap:0;margin-top:6px;}
+  .tl .col-t{grid-column:1;}
+  .tl .col-b{grid-column:2;}
+  .tl .node{position:relative;padding-bottom:26px;}
+  .tl .node:last-child{padding-bottom:0;}
+  .tl .dot{
+    width:22px;height:22px;border-radius:50%;background:var(--red);color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:700;position:relative;z-index:1;margin-top:3px;
+  }
+  .tl .node:not(:last-child)::after{
+    content:"";position:absolute;left:10px;top:25px;bottom:-2px;width:2px;background:var(--line-strong);
+  }
+  .tl .card{padding:0 0 6px 16px;}
+  .tl .card h3{font-size:15px;font-weight:700;}
+  .tl .card p{font-size:13px;color:var(--gray);margin-top:3px;}
+  .tl .card .tt{font-size:12px;color:var(--red);font-weight:600;margin-top:3px;letter-spacing:.04em;}
+
+  /* ===== 要点与注意 ===== */
+  .points{display:grid;grid-template-columns:1fr;gap:10px;}
+  @media (min-width:768px){.points{grid-template-columns:repeat(3,1fr);}}
+  .point{border-top:3px solid var(--ink);padding:12px 2px 4px;}
+  .point h3{font-size:15px;font-weight:800;display:flex;align-items:center;gap:8px;}
+  .point h3 svg{width:18px;height:18px;flex:none;}
+  .point p{font-size:13px;color:var(--ink-soft);margin-top:6px;line-height:1.6;}
+  .warn{background:var(--block);padding:14px 18px;margin-top:16px;font-size:13px;color:var(--ink-soft);}
+  .warn h3{font-size:13px;font-weight:700;color:var(--red-deep);letter-spacing:.1em;margin-bottom:8px;}
+  .warn ul{list-style:none;}
+  .warn li{padding-left:14px;position:relative;margin-top:5px;}
+  .warn li::before{content:"—";position:absolute;left:0;color:var(--red);}
+
+  /* ===== 联系栏 ===== */
+  .contact{margin-top:34px;background:var(--ink);color:#fff;padding:22px 20px;}
+  .contact h2{font-size:18px;font-weight:800;letter-spacing:.04em;}
+  .contact .rows{display:grid;grid-template-columns:1fr;gap:8px;margin-top:14px;font-size:14px;}
+  @media (min-width:768px){.contact .rows{grid-template-columns:1fr 1fr;}}
+  .contact .row{display:flex;align-items:center;gap:10px;border-bottom:1px solid #3A352E;padding-bottom:8px;}
+  .contact .row .lbl{color:#9A9188;font-size:12px;letter-spacing:.1em;width:52px;flex:none;}
+  .contact .row .val{color:#fff;letter-spacing:.06em;}
+  .contact .row .val.blank{color:#6E675C;letter-spacing:.2em;}
+  .foot{margin-top:18px;font-size:11.5px;color:var(--gray);line-height:1.7;text-align:center;}
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <div class="topbar">
+    <span class="left">
+      <svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M7 10l3-4h12l3 4v12l-4 4h-4v-8h-4v8h-4l-4-4V10z" stroke="#C8102E" stroke-width="2.2" stroke-linejoin="round"/></svg>
+      AI 视觉定制服务 · 服装模特图
+    </span>
+    <span class="no">NO.&nbsp;________</span>
+  </div>
+
+  <header class="head">
+    <span class="kicker">SERVICE QUOTE</span>
+    <h1>AI 服装模特图服务报价单
+      <span class="sub">把服装平铺图，变成真人上身效果图</span>
+    </h1>
+    <div class="meta">
+      <span>日期：<b>2026 年 11 月</b></span>
+      <span>服务对象：<b>线下服装门店 / 电商卖家 / 批发档口</b></span>
+      <span>报价有效期：<b>30 天</b></span>
+    </div>
+  </header>
+
+  <div class="compare">
+    <div class="cmp old">
+      <div class="t">传统模特拍摄（单日成本）</div>
+      <div class="num">4000–10000 元</div>
+      <div class="d">模特出场 2000–5000 · 摄影 1000–3000 · 场地 500–2000 · 化妆 500–1000，一张图折合约 100 元</div>
+    </div>
+    <div class="cmp new">
+      <div class="t">AI 换装服务（单张价格）</div>
+      <div class="num">30–50 元</div>
+      <div class="d">成本接近零 · 2–4 小时交付 · 可批量 · 一套模特库覆盖多种体型肤色风格</div>
+    </div>
+  </div>
+
+  <div class="sec"><span class="idx">01</span><h2>服务项目与价格</h2><span class="line"></span></div>
+  <table class="items">
+    <colgroup><col><col><col></colgroup>
+    <thead><tr><th>服务项目</th><th>说明</th><th>参考价</th></tr></thead>
+    <tbody>
+      <tr class="hot">
+        <td>AI 虚拟换装模特图<span class="tag-hot">主力</span></td>
+        <td>客户提供服装平铺图/上身图，AI 生成真人模特上身效果；正面、侧面、背面可选，含人工精修</td>
+        <td class="price">30–50<small> 元/张</small></td>
+      </tr>
+      <tr>
+        <td>批量换装套餐</td>
+        <td>20–50 件服装，每件正侧两面出图；同一模特库批量制作，效率最高</td>
+        <td class="price">1000–3000<small> 元/批</small></td>
+      </tr>
+      <tr>
+        <td>全品类模特图</td>
+        <td>50–100 个 SKU，用不同体型、肤色、年龄段的模特覆盖，适配多平台多渠道</td>
+        <td class="price">3000–8000<small> 元</small></td>
+      </tr>
+      <tr>
+        <td>月度合作</td>
+        <td>每月按新款数量固定出图，随上随做，价格随款式数浮动</td>
+        <td class="price">1500–5000<small> 元/月</small></td>
+      </tr>
+      <tr>
+        <td>主图 / 详情页</td>
+        <td>商品主图 + 场景图，或详情页整包设计，含卖点排版</td>
+        <td class="price">199–499<small> 元/件</small></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="sec"><span class="idx">02</span><h2>交付规格</h2><span class="line"></span></div>
+  <div class="spec">
+    <h3>按平台要求导出，主流规格全覆盖</h3>
+    <div class="chips">
+      <span class="chip">淘宝/天猫主图 <b>800×800</b></span>
+      <span class="chip">详情页宽图 <b>750×1000+</b></span>
+      <span class="chip">小红书/抖音 <b>3:4 竖图</b></span>
+      <span class="chip">朋友圈九宫格 <b>1:1</b></span>
+      <span class="chip">高清大图 <b>1024×1536</b></span>
+    </div>
+    <div class="note">默认含 2 轮免费修改；批量订单按批交付，先出小样确认风格后再批量制作。</div>
+  </div>
+
+  <div class="sec"><span class="idx">03</span><h2>真实案例</h2><span class="line"></span></div>
+  <div class="demo">
+    <div class="case2">
+      <figure>
+        <img src="assets/case-flat-1.jpg" alt="客户提供的红黑格纹衬衫平铺图">
+        <figcaption>客户素材 · 平铺图</figcaption>
+      </figure>
+      <div class="arrow">→</div>
+      <figure>
+        <img src="assets/ai-onbody-1.jpg" alt="AI生成的同一件衬衫上身效果图">
+        <figcaption>AI 出图 · 上身效果</figcaption>
+      </figure>
+      <div class="arrow">→</div>
+      <figure>
+        <img src="assets/case-live-1.jpg" alt="同一件衬衫的真人穿搭实拍">
+        <figcaption>真人实拍 · 参考</figcaption>
+      </figure>
+    </div>
+    <div class="cap">同一件红黑格纹衬衫：客户平铺图 → AI 上身效果 → 真人实拍参考</div>
+    <div class="foot">真实素材制作：平铺图与真人实拍由客户提供，上身效果由 AI 生成；本案例用于展示服务效果。</div>
+  </div>
+
+  <div class="sec"><span class="idx">04</span><h2>服务流程</h2><span class="line"></span></div>
+  <div class="tl">
+    <div class="col-t">
+      <div class="node"><div class="dot">1</div></div>
+      <div class="node"><div class="dot">2</div></div>
+      <div class="node"><div class="dot">3</div></div>
+      <div class="node"><div class="dot">4</div></div>
+      <div class="node"><div class="dot">5</div></div>
+    </div>
+    <div class="col-b">
+      <div class="card"><h3>需求沟通</h3><p>确认服装款数、模特风格（体型/肤色/年龄）、角度与平台规格，报价下单</p><div class="tt">当日 · 10 分钟</div></div>
+      <div class="card"><h3>提供素材</h3><p>客户只需提供服装平铺图或样衣实拍图；模特图由服务方提供，效果可控</p><div class="tt">当日</div></div>
+      <div class="card"><h3>AI 生成</h3><p>换装模型生成初稿，还原面料褶皱、纹理与图案细节</p><div class="tt">每张 1–3 分钟</div></div>
+      <div class="card"><h3>人工精修</h3><p>修边缘、调色、修手部，逐张检查图案方向与细节，达到可商用标准</p><div class="tt">占整体 60% 工时</div></div>
+      <div class="card"><h3>交付修改</h3><p>按平台规格导出打包，含 2 轮免费修改，确认后结款</p><div class="tt">单款 2–4 小时交付</div></div>
+    </div>
+  </div>
+
+  <div class="sec"><span class="idx">05</span><h2>为什么选我们</h2><span class="line"></span></div>
+  <div class="points">
+    <div class="point">
+      <h3><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 6h16v10H4z" stroke="#C8102E" stroke-width="2"/><path d="M8 20h8" stroke="#C8102E" stroke-width="2" stroke-linecap="round"/></svg>省拍摄成本</h3>
+      <p>一季上新模特图，传统拍摄动辄几千上万；AI 出图价格只有拍摄的 1/3 到 1/10，省下的钱可投入推广。</p>
+    </div>
+    <div class="point">
+      <h3><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l8 4v5c0 4-3.5 7.5-8 9-4.5-1.5-8-5-8-9V7l8-4z" stroke="#C8102E" stroke-width="2" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="#C8102E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>效果可控</h3>
+      <p>面料纹理图案精准还原；模特图库由服务方统一管理，风格一致、质量稳定，不做完就发。</p>
+    </div>
+    <div class="point">
+      <h3><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z" stroke="#C8102E" stroke-width="2" stroke-linejoin="round"/></svg>交付快</h3>
+      <p>单款 2–4 小时交付初稿，批量订单按批走；上新速度直接决定店铺流量，不让你等档期。</p>
+    </div>
+  </div>
+
+  <div class="warn">
+    <h3>特别说明</h3>
+    <ul>
+      <li>蕾丝、薄纱、雪纺等透明面料 AI 处理难度高，接单前先免费试做一张确认效果。</li>
+      <li>请提供清晰的平铺图或上身图（白底、光线均匀为佳），素材质量直接影响出图效果。</li>
+      <li>报价为参考价，具体以需求沟通后的确认单为准；批量与长期合作可再议价。</li>
+    </ul>
+  </div>
+
+  <div class="contact">
+    <h2>联系与服务</h2>
+    <div class="rows">
+      <div class="row"><span class="lbl">微信</span><span class="val">单辰</span></div>
+      <div class="row"><span class="lbl">电话</span><span class="val">加微信后提供</span></div>
+      <div class="row"><span class="lbl">门店</span><span class="val blank">________________</span></div>
+      <div class="row"><span class="lbl">备注</span><span class="val blank">________________</span></div>
+    </div>
+  </div>
+
+  <div class="foot">本报价单基于 2026 年公开的 AI 换装接单案例整理，价格随款式数量、面料复杂度、交期浮动，以最终确认为准。· AI 视觉定制服务</div>
+</div>
+</body>
+</html>
